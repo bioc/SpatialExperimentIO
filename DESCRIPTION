@@ -32,5 +32,5 @@ biocViews:
   SingleCell, 
   Spatial,
   GeneExpression
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Config/testthat/edition: 3

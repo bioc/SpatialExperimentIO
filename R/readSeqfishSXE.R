@@ -1,0 +1,125 @@
+#' @rdname readSeqfishSXE
+#' 
+#' @title Load data from a Spatial Genomics seqFISH experiment
+#' 
+#' @description
+#' Creates a \code{\link{SpatialExperiment}} from the downloaded seqFISH   
+#' directory for Spatial Genomics seqFISH spatial gene expression data.
+#'
+#' @param dirname a directory path to seqFISH download that contains files of interest.
+#' @param return_type option of \code{"SPE"} or \code{"SCE"}, stands for 
+#' \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}
+#' @param countmatfpattern a filename pattern for the count matrix. Default value is 
+#' \code{"CellxGene.csv"}, and there is no need to change.
+#' @param metadatafpattern a filename pattern for the metadata .csv file that 
+#' contains spatial coords. Default value is \code{"CellCoordinates.csv"}, and 
+#' there is no need to change.
+#' @param coord_names a vector of two strings specify the spatial coord names. 
+#' Default value is \code{c("center_x", "center_y")}, and there is no need to change.
+#' 
+#' @details
+#' The constructor assumes the downloaded seqFISH count matrix and metadata in 
+#' the same folder with the following structure:
+#' seqFISH_folder/ \cr
+#' · | — *_CellxGene.csv \cr
+#' · | — *_CellCoordinates.csv \cr
+#' 
+#'
+#' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
+#' @export
+#' 
+#' @author Yixing Estella Dong
+#'
+#' @examples
+#' # A relatively small data download can be from:
+#' \dontrun{
+#' https://spatialgenomics.com/data/#kidney-data
+#' }
+#' 
+#' # A mock counts and mock metadata with spatial location generated for a 9 genes by 
+#' # 13 cells object is in /extdata: 
+#' 
+#' seqfpath <- system.file(
+#'   file.path("extdata", "seqFISH_small"),
+#'   package = "SpatialExperimentIO")
+#'   
+#' list.files(merpath)
+#' 
+#' # One of the following depending on your output (`SPE` or `SCE`) requirement.
+#' seqf_spe <- readSeqfishSXE(dirname = seqfpath)
+#' seqf_sce <- readSeqfishSXE(dirname = seqfpath, return_type = "SCE")
+#' 
+#' 
+#' @importFrom SpatialExperiment SpatialExperiment
+#' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
+#' @importFrom methods as
+#' @importFrom utils read.csv
+readSeqfishSXE <- function(dirname = dirname, 
+                            return_type = "SPE",
+                            countmatfpattern = "CellxGene.csv", 
+                            metadatafpattern = "CellCoordinates.csv", 
+                            coord_names = c("center_x", "center_y")){
+  
+  if(!return_type %in% c("SPE", "SCE")){
+    stop("'return_type' must be one of c('SPE', 'SCE')")
+  }
+  
+  ## Metadata sanity check 
+  if(!any(file.exists(file.path(dirname, list.files(dirname, metadatafpattern))))){
+    stop("seqFISH metadata file does not exist in the directory. Expect 'CellCoordinates.csv' in `dirname`")
+  }
+  
+  metadata_file <- file.path(dirname, list.files(dirname, metadatafpattern))
+  if(length(metadata_file) > 1){
+    stop("More than one metadata file possible with the provided pattern `metadatafpattern`")
+  }
+  
+  ## Count matrix sanity check
+  if(!any(file.exists(file.path(dirname, list.files(dirname, countmatfpattern))))){
+    stop("seqFISH count matrix does not exist in the directory. Expect 'CellxGene.csv' in `dirname`")
+  }
+  
+  countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
+  if(length(countmat_file) > 1){
+    stop("More than one count matrix file possible with the provided pattern `countmatfpattern`")
+  }
+  
+  # Read in 
+  countmat <- read.csv(countmat_file)
+  names(countmat)[names(countmat) == "X"] <- "cell"
+  countmat <- countmat[order(countmat$cell), ]
+  
+  metadata <- read.csv(metadata_file)
+  names(metadata)[names(metadata) == "label"] <- "cell"
+  metadata <- metadata[order(metadata$cell), ]
+  
+  # Count matrix 
+  countmat <- t(subset(countmat, select = -cell))
+  
+  # rowData (does not exist)
+  
+  # metadata
+  metadata <- subset(metadata, select = -cell)
+  
+  if(!all(coord_names %in% colnames(metadata))){
+    stop("`coord_names` not in columns of `metadatafpattern`. For seqFISH, expect c('center_x', 'center_y') in the columns of the metadata 'cell_metadata.csv'. " )
+  }
+  
+  if(return_type == "SPE"){
+    # construct 'SpatialExperiment'
+    sxe <- SpatialExperiment::SpatialExperiment(
+      assays = list(counts = as(countmat, "dgCMatrix")),
+      # rowData = rowData,
+      colData = metadata,
+      spatialCoordsNames = coord_names)
+  }else if(return_type == "SCE"){
+    # construct 'SingleCellExperiment'
+    sxe <- SingleCellExperiment::SingleCellExperiment(
+      assays = list(counts = as(countmat, "dgCMatrix")),
+      colData = metadata
+    )
+  }
+  
+  return(sxe)
+  
+}
