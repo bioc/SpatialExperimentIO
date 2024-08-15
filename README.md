@@ -1,6 +1,6 @@
 # Introduction
 
-The `SpatialExperimentIO` package provides a set of functions to import Xenium (10x Genomics), CosMx (Nanostring), MERSCOPE (Vizgen), STARmapPLUS (Wang et al., 2023, Broad Institute) data into a `SpatialExperiment` or `SingleCellExperiment`class object.
+The `SpatialExperimentIO` package provides a set of functions to import Xenium (10x Genomics), CosMx (Nanostring), MERSCOPE (Vizgen), STARmapPLUS (Wang et al., 2023, Broad Institute), and seqFISH (Spatial Genomics) data into a `SpatialExperiment` or `SingleCellExperiment`class object.
 
 # Installation
 
@@ -27,7 +27,7 @@ library(SpatialExperimentIO)
 
 # Xenium ouptut folder structure
 
-A standard Xenium output folder should contain these files for the function `readXeniumSXE()`. Either `cell_feature_matrix.h5` or `/cell_feature_matrix`, and cells.csv.gz are required.
+A standard Xenium output folder should contain these files for the function `readXeniumSXE()`. `cells.csv.gz` and either `cell_feature_matrix.h5` or `/cell_feature_matrix` are required.
 
 ```         
     Xenium_unzipped
@@ -43,7 +43,7 @@ A standard Xenium output folder should contain these files for the function `rea
 
 # CosMx output folder structure
 
-A standard CosMx output folder should contain these files for the function `readCosMxSXE()`. Both `exprMat_file.csv` and `metadata_file.csv` is required.
+A standard CosMx output folder should contain these files for the function `readCosMxSXE()`. Both `metadata_file.csv` and `exprMat_file.csv` are required.
 
 ```         
     CosMx 
@@ -53,7 +53,7 @@ A standard CosMx output folder should contain these files for the function `read
 
 # MERSCOPE output folder structure
 
-A standard MERSCOPE output folder should contain these files for the function `readMerscopeSXE()`. Both `cell_by_gene.csv` and `cell_metadata.csv` is required.
+A standard MERSCOPE output folder should contain these files for the function `readMerscopeSXE()`. Both `cell_metadata.csv` and `cell_by_gene.csv` are required.
 
 ```         
     MERSCOPE 
@@ -63,12 +63,22 @@ A standard MERSCOPE output folder should contain these files for the function `r
 
 # STARmap PLUS output folder structure
 
-A standard STARmap PLUS output folder should contain these files for the function `readStarmapplusSXE()`. Both `raw_expression_pd.csv` and `spatial.csv` is required.
+A standard STARmap PLUS output folder should contain these files for the function `readStarmapplusSXE()`. Both `spatial.csv` and `raw_expression_pd.csv` are required.
 
 ```         
     STARmap_PLUS 
         ├── spatial.csv 
         └── raw_expression_pd.csv
+```
+
+# seqFISH output folder structure
+
+A standard seqFISH output folder should contain these files for the function `readSeqfishSXE()`. Both `CellCoordinates.csv` and `CellxGene.csv` are required.
+
+```         
+    seqFISH 
+        ├── CellCoordinates.csv 
+        └── CellxGene.csv
 ```
 
 # Usage
