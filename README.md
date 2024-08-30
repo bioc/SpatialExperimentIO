@@ -1,5 +1,7 @@
 # Introduction
 
+<img src="inst/extdata/SpatialExperimentIO.png" width="200" align="right"/>
+
 The `SpatialExperimentIO` package provides a set of functions to import Xenium (10x Genomics), CosMx (Nanostring), MERSCOPE (Vizgen), STARmapPLUS (Wang et al., 2023, Broad Institute), and seqFISH (Spatial Genomics) data into a `SpatialExperiment` or `SingleCellExperiment`class object.
 
 # Installation

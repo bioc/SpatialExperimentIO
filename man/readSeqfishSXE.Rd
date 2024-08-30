@@ -5,27 +5,27 @@
 \title{Load data from a Spatial Genomics seqFISH experiment}
 \usage{
 readSeqfishSXE(
-  dirname = dirname,
-  return_type = "SPE",
-  countmatfpattern = "CellxGene.csv",
-  metadatafpattern = "CellCoordinates.csv",
-  coord_names = c("center_x", "center_y")
+  dirName = dirName,
+  returnType = "SPE",
+  countMatPattern = "CellxGene.csv",
+  metaDataPattern = "CellCoordinates.csv",
+  coordNames = c("center_x", "center_y")
 )
 }
 \arguments{
-\item{dirname}{a directory path to seqFISH download that contains files of interest.}
+\item{dirName}{a directory path to seqFISH download that contains files of interest.}
 
-\item{return_type}{option of \code{"SPE"} or \code{"SCE"}, stands for
+\item{returnType}{option of \code{"SPE"} or \code{"SCE"}, stands for
 \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}}
 
-\item{countmatfpattern}{a filename pattern for the count matrix. Default value is
+\item{countMatPattern}{a filename pattern for the count matrix. Default value is
 \code{"CellxGene.csv"}, and there is no need to change.}
 
-\item{metadatafpattern}{a filename pattern for the metadata .csv file that
+\item{metaDataPattern}{a filename pattern for the metadata .csv file that
 contains spatial coords. Default value is \code{"CellCoordinates.csv"}, and
 there is no need to change.}
 
-\item{coord_names}{a vector of two strings specify the spatial coord names.
+\item{coordNames}{a vector of two strings specify the spatial coord names.
 Default value is \code{c("center_x", "center_y")}, and there is no need to change.}
 }
 \value{
@@ -44,9 +44,8 @@ seqFISH_folder/ \cr
 }
 \examples{
 # A relatively small data download can be from:
-\dontrun{
-https://spatialgenomics.com/data/#kidney-data
-}
+# https://spatialgenomics.com/data/#kidney-data
+
 
 # A mock counts and mock metadata with spatial location generated for a 9 genes by 
 # 13 cells object is in /extdata: 
@@ -55,11 +54,11 @@ seqfpath <- system.file(
   file.path("extdata", "seqFISH_small"),
   package = "SpatialExperimentIO")
   
-list.files(merpath)
+list.files(seqfpath)
 
 # One of the following depending on your output (`SPE` or `SCE`) requirement.
-seqf_spe <- readSeqfishSXE(dirname = seqfpath)
-seqf_sce <- readSeqfishSXE(dirname = seqfpath, return_type = "SCE")
+seqf_spe <- readSeqfishSXE(dirName = seqfpath)
+seqf_sce <- readSeqfishSXE(dirName = seqfpath, returnType = "SCE")
 
 
 }

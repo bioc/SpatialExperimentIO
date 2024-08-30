@@ -19,11 +19,11 @@ test_that("needed files contains spatial columns of interest", {
 })
 
 test_that("data are read correctly to SpatialExperiment class", {
-  x <- readXeniumSXE(dirname = dir, 
-                     return_type = "SPE",
-                     countmatfpattern = "cell_feature_matrix.h5",
-                     metadatafpattern = "cells.csv.gz", 
-                     coord_names = c("x_centroid", "y_centroid"))
+  x <- readXeniumSXE(dirName = dir, 
+                     returnType = "SPE",
+                     countMatPattern = "cell_feature_matrix.h5",
+                     metaDataPattern = "cells.csv.gz", 
+                     coordNames = c("x_centroid", "y_centroid"))
   
   expect_s4_class(x, "SpatialExperiment")
   expect_true(all(colnames(SpatialExperiment::spatialCoords(x)) == c("x_centroid", "y_centroid")))
@@ -34,11 +34,11 @@ test_that("data are read correctly to SpatialExperiment class", {
 })
 
 test_that("data are read correctly to SingleCellExperiment class", {
-  x <- readXeniumSXE(dirname = dir, 
-                     return_type = "SCE",
-                     countmatfpattern = "cell_feature_matrix.h5",
-                     metadatafpattern = "cells.csv.gz", 
-                     coord_names = c("x_centroid", "y_centroid"))
+  x <- readXeniumSXE(dirName = dir, 
+                     returnType = "SCE",
+                     countMatPattern = "cell_feature_matrix.h5",
+                     metaDataPattern = "cells.csv.gz", 
+                     coordNames = c("x_centroid", "y_centroid"))
   
   expect_s4_class(x, "SingleCellExperiment")
   expect_true(all(c("x_centroid", "y_centroid") %in% colnames(SingleCellExperiment::colData(x))))

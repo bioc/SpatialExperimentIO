@@ -5,27 +5,27 @@
 \title{Load data from a Nanostring CosMx experiment}
 \usage{
 readCosmxSXE(
-  dirname = dirname,
-  return_type = "SPE",
-  countmatfpattern = "exprMat_file.csv",
-  metadatafpattern = "metadata_file.csv",
-  coord_names = c("CenterX_global_px", "CenterY_global_px")
+  dirName = dirName,
+  returnType = "SPE",
+  countMatPattern = "exprMat_file.csv",
+  metaDataPattern = "metadata_file.csv",
+  coordNames = c("CenterX_global_px", "CenterY_global_px")
 )
 }
 \arguments{
-\item{dirname}{a directory path to CosMx download that contains files of interest.}
+\item{dirName}{a directory path to CosMx download that contains files of interest.}
 
-\item{return_type}{option of \code{"SPE"} or \code{"SCE"}, stands for
+\item{returnType}{option of \code{"SPE"} or \code{"SCE"}, stands for
 \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}}
 
-\item{countmatfpattern}{a filename pattern for the count matrix. Default value is
+\item{countMatPattern}{a filename pattern for the count matrix. Default value is
 \code{"exprMat_file.csv"}, and there is no need to change.}
 
-\item{metadatafpattern}{a filename pattern for the metadata .csv file that
+\item{metaDataPattern}{a filename pattern for the metadata .csv file that
 contains spatial coords. Default value is \code{"metadata_file.csv"}, and
 there is no need to change.}
 
-\item{coord_names}{a vector of two strings specify the spatial coord names.
+\item{coordNames}{a vector of two strings specify the spatial coord names.
 Default value is \code{c("CenterX_global_px", "CenterY_global_px")}, and
 there is no need to change.}
 }
@@ -45,9 +45,8 @@ CosMx_unzipped/optional_default_folder/ \cr
 }
 \examples{
 # A relatively small data download can be from:
-\dontrun{
-https://nanostring.com/resources/smi-ffpe-dataset-lung9-rep1-data/
-}
+# https://nanostring.com/resources/smi-ffpe-dataset-lung9-rep1-data/
+
 
 # A mock counts and mock metadata with spatial location generated for a 8 genes by 
 # 9 cells object is in /extdata: 
@@ -59,8 +58,8 @@ cospath <- system.file(
 list.files(cospath)
 
 # One of the following depending on your output (`SPE` or `SCE`) requirement.
-cos_spe <- readCosmxSXE(dirname = cospath)
-cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
+cos_spe <- readCosmxSXE(dirName = cospath)
+cos_sce <- readCosmxSXE(dirName = cospath, returnType = "SCE")
 
 
 }

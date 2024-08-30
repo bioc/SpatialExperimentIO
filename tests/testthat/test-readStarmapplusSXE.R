@@ -17,11 +17,11 @@ test_that("needed files contains spatial columns of interest", {
 })
 
 test_that("data are read correctly to SpatialExperiment class", {
-  x <- readStarmapplusSXE(dirname = dir, 
-                          return_type = "SPE",
-                          countmatfpattern = "raw_expression_pd.csv", 
-                          metadatafpattern = "spatial.csv", 
-                          coord_names = c("X", "Y", "Z"))
+  x <- readStarmapplusSXE(dirName = dir, 
+                          returnType = "SPE",
+                          countMatPattern = "raw_expression_pd.csv", 
+                          metaDataPattern = "spatial.csv", 
+                          coordNames = c("X", "Y", "Z"))
   
   expect_s4_class(x, "SpatialExperiment")
   expect_true(all(colnames(SpatialExperiment::spatialCoords(x)) == c("X", "Y", "Z")))
@@ -32,11 +32,11 @@ test_that("data are read correctly to SpatialExperiment class", {
 })
 
 test_that("data are read correctly to SingleCellExperiment class", {
-  x <- readStarmapplusSXE(dirname = dir, 
-                          return_type = "SCE",
-                          countmatfpattern = "raw_expression_pd.csv", 
-                          metadatafpattern = "spatial.csv", 
-                          coord_names = c("X", "Y", "Z"))
+  x <- readStarmapplusSXE(dirName = dir, 
+                          returnType = "SCE",
+                          countMatPattern = "raw_expression_pd.csv", 
+                          metaDataPattern = "spatial.csv", 
+                          coordNames = c("X", "Y", "Z"))
   
   expect_s4_class(x, "SingleCellExperiment")
   expect_true(all(c("X", "Y", "Z") %in% colnames(SingleCellExperiment::colData(x))))

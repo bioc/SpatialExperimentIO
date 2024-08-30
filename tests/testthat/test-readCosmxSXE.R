@@ -19,11 +19,11 @@ test_that("needed files contains spatial columns of interest", {
 })
 
 test_that("data are read correctly to SpatialExperiment class", {
-  x <- readCosmxSXE(dirname = dir, 
-                    return_type = "SPE",
-                    countmatfpattern = "exprMat_file.csv", 
-                    metadatafpattern = "metadata_file.csv", 
-                    coord_names = c("CenterX_global_px",
+  x <- readCosmxSXE(dirName = dir, 
+                    returnType = "SPE",
+                    countMatPattern = "exprMat_file.csv", 
+                    metaDataPattern = "metadata_file.csv", 
+                    coordNames = c("CenterX_global_px",
                                     "CenterY_global_px"))
   
   expect_s4_class(x, "SpatialExperiment")
@@ -35,11 +35,11 @@ test_that("data are read correctly to SpatialExperiment class", {
 })
 
 test_that("data are read correctly to SingleCellExperiment class", {
-  x <- readCosmxSXE(dirname = dir, 
-                    return_type = "SCE",
-                    countmatfpattern = "exprMat_file.csv",
-                    metadatafpattern = "metadata_file.csv", 
-                    coord_names = c("CenterX_global_px", 
+  x <- readCosmxSXE(dirName = dir, 
+                    returnType = "SCE",
+                    countMatPattern = "exprMat_file.csv",
+                    metaDataPattern = "metadata_file.csv", 
+                    coordNames = c("CenterX_global_px", 
                                     "CenterY_global_px"))
   
   expect_s4_class(x, "SingleCellExperiment")

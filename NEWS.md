@@ -1,3 +1,1 @@
-# SpatialExperimentIO 0.0.99
-
-* Initial CRAN submission.
+# SpatialExperimentIO 0.99.2

@@ -19,11 +19,11 @@ test_that("needed files contains spatial columns of interest", {
 })
 
 test_that("data are read correctly to SpatialExperiment class", {
-  x <- readMerscopeSXE(dirname = dir, 
-                       return_type = "SPE",
-                       countmatfpattern = "cell_by_gene.csv", 
-                       metadatafpattern = "cell_metadata.csv", 
-                       coord_names = c("center_x", "center_y"))
+  x <- readMerscopeSXE(dirName = dir, 
+                       returnType = "SPE",
+                       countMatPattern = "cell_by_gene.csv", 
+                       metaDataPattern = "cell_metadata.csv", 
+                       coordNames = c("center_x", "center_y"))
   
   expect_s4_class(x, "SpatialExperiment")
   expect_true(all(colnames(SpatialExperiment::spatialCoords(x)) == c("center_x", "center_y")))
@@ -34,11 +34,11 @@ test_that("data are read correctly to SpatialExperiment class", {
 })
 
 test_that("data are read correctly to SingleCellExperiment class", {
-  x <- readMerscopeSXE(dirname = dir, 
-                       return_type = "SCE",
-                       countmatfpattern = "cell_by_gene.csv", 
-                       metadatafpattern = "cell_metadata.csv", 
-                       coord_names = c("center_x", "center_y"))
+  x <- readMerscopeSXE(dirName = dir, 
+                       returnType = "SCE",
+                       countMatPattern = "cell_by_gene.csv", 
+                       metaDataPattern = "cell_metadata.csv", 
+                       coordNames = c("center_x", "center_y"))
   
   expect_s4_class(x, "SingleCellExperiment")
   expect_true(all(c("center_x", "center_y") %in% colnames(SingleCellExperiment::colData(x))))

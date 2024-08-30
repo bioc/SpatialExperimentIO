@@ -5,27 +5,27 @@
 \title{Load data from a STARmap PLUS experiment}
 \usage{
 readStarmapplusSXE(
-  dirname = dirname,
-  return_type = "SPE",
-  countmatfpattern = "raw_expression_pd.csv",
-  metadatafpattern = "spatial.csv",
-  coord_names = c("X", "Y", "Z")
+  dirName = dirName,
+  returnType = "SPE",
+  countMatPattern = "raw_expression_pd.csv",
+  metaDataPattern = "spatial.csv",
+  coordNames = c("X", "Y", "Z")
 )
 }
 \arguments{
-\item{dirname}{a directory path to STARmap PLUS download that contains files of interest.}
+\item{dirName}{a directory path to STARmap PLUS download that contains files of interest.}
 
-\item{return_type}{option of \code{"SPE"} or \code{"SCE"}, stands for
+\item{returnType}{option of \code{"SPE"} or \code{"SCE"}, stands for
 \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}}
 
-\item{countmatfpattern}{a filename pattern for the count matrix. Default value is
+\item{countMatPattern}{a filename pattern for the count matrix. Default value is
 \code{"raw_expression_pd.csv"}, and there is no need to change.}
 
-\item{metadatafpattern}{a filename pattern for the metadata .csv file that
+\item{metaDataPattern}{a filename pattern for the metadata .csv file that
 contains spatial coords. Default value is \code{"spatial.csv"}, and
 there is no need to change.}
 
-\item{coord_names}{a vector of three strings specify the spatial coord names.
+\item{coordNames}{a vector of three strings specify the spatial coord names.
 Default value is \code{c("X", "Y", "Z")}, and there is no need to change.}
 }
 \value{
@@ -44,9 +44,8 @@ STARmap_PLUS_download/ \cr
 }
 \examples{
 # A relatively small data download can be from:
-\dontrun{
-https://zenodo.org/records/8327576
-}
+# https://zenodo.org/records/8327576
+
 
 # A mock counts and mock metadata with spatial location generated for a 8 genes by 
 # 9 cells object is in /extdata: 
@@ -58,8 +57,8 @@ starpath <- system.file(
 list.files(starpath)
 
 # One of the following depending on your output (`SPE` or `SCE`) requirement.
-star_spe <- readStarmapplusSXE(dirname = starpath)
-star_sce <- readStarmapplusSXE(dirname = starpath, return_type = "SCE")
+star_spe <- readStarmapplusSXE(dirName = starpath)
+star_sce <- readStarmapplusSXE(dirName = starpath, returnType = "SCE")
 
 
 }

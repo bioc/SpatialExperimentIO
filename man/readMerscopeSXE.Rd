@@ -5,27 +5,27 @@
 \title{Load data from a Vizgen MERSCOPE experiment}
 \usage{
 readMerscopeSXE(
-  dirname = dirname,
-  return_type = "SPE",
-  countmatfpattern = "cell_by_gene.csv",
-  metadatafpattern = "cell_metadata.csv",
-  coord_names = c("center_x", "center_y")
+  dirName = dirName,
+  returnType = "SPE",
+  countMatPattern = "cell_by_gene.csv",
+  metaDataPattern = "cell_metadata.csv",
+  coordNames = c("center_x", "center_y")
 )
 }
 \arguments{
-\item{dirname}{a directory path to MERSCOPE download that contains files of interest.}
+\item{dirName}{a directory path to MERSCOPE download that contains files of interest.}
 
-\item{return_type}{option of \code{"SPE"} or \code{"SCE"}, stands for
+\item{returnType}{option of \code{"SPE"} or \code{"SCE"}, stands for
 \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}}
 
-\item{countmatfpattern}{a filename pattern for the count matrix. Default value is
+\item{countMatPattern}{a filename pattern for the count matrix. Default value is
 \code{"cell_by_gene.csv"}, and there is no need to change.}
 
-\item{metadatafpattern}{a filename pattern for the metadata .csv file that
+\item{metaDataPattern}{a filename pattern for the metadata .csv file that
 contains spatial coords. Default value is \code{"metadata_file.csv"}, and
 there is no need to change.}
 
-\item{coord_names}{a vector of two strings specify the spatial coord names.
+\item{coordNames}{a vector of two strings specify the spatial coord names.
 Default value is \code{c("center_x", "center_y")}, and there is no need to change.}
 }
 \value{
@@ -44,11 +44,10 @@ MERSCOPE_folder/ \cr
 }
 \examples{
 # A relatively small data download can be from:
-\dontrun{
-https://console.cloud.google.com/storage/browser/vz-ffpe-showcase/
-HumanOvarianCancerPatient2Slice2?pageState=(\%22StorageObjectListTable\%22:
-(\%22f\%22:\%22\%255B\%255D\%22))&prefix=&forceOnObjectsSortingFiltering=false
-}
+# https://console.cloud.google.com/storage/browser/vz-ffpe-showcase/
+# HumanOvarianCancerPatient2Slice2?pageState=(\%22StorageObjectListTable\%22:
+# (\%22f\%22:\%22\%255B\%255D\%22))&prefix=&forceOnObjectsSortingFiltering=false
+
 
 # A mock counts and mock metadata with spatial location generated for a 9 genes by 
 # 8 cells object is in /extdata: 
@@ -60,8 +59,8 @@ merpath <- system.file(
 list.files(merpath)
 
 # One of the following depending on your output (`SPE` or `SCE`) requirement.
-mer_spe <- readMerscopeSXE(dirname = merpath)
-mer_sce <- readMerscopeSXE(dirname = merpath, return_type = "SCE")
+mer_spe <- readMerscopeSXE(dirName = merpath)
+mer_sce <- readMerscopeSXE(dirName = merpath, returnType = "SCE")
 
 
 }

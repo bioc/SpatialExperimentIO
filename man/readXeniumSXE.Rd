@@ -5,31 +5,31 @@
 \title{Load data from a 10x Geonomics Xenium experiment}
 \usage{
 readXeniumSXE(
-  dirname,
-  return_type = "SPE",
-  countmatfpattern = "cell_feature_matrix.h5",
-  metadatafpattern = "cells.csv.gz",
-  coord_names = c("x_centroid", "y_centroid")
+  dirName,
+  returnType = "SPE",
+  countMatPattern = "cell_feature_matrix.h5",
+  metaDataPattern = "cells.csv.gz",
+  coordNames = c("x_centroid", "y_centroid")
 )
 }
 \arguments{
-\item{dirname}{a directory path to Xenium Output Bundle download that contains
+\item{dirName}{a directory path to Xenium Output Bundle download that contains
 files of interest.}
 
-\item{return_type}{option of \code{"SPE"} or \code{"SCE"}, stands for
+\item{returnType}{option of \code{"SPE"} or \code{"SCE"}, stands for
 \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}}
 
-\item{countmatfpattern}{a folder directory or the h5 file pattern for the count matrix.
+\item{countMatPattern}{a folder directory or the h5 file pattern for the count matrix.
 Default value is \code{"cell_feature_matrix.h5"}, alternative value is
 \code{"cell_feature_matrix"} that takes a bit longer. The count matrix is
 read in and stored in a \code{SingleCellExperiment} object, using
 \code{DropletUtils::read10xCounts()}}
 
-\item{metadatafpattern}{a filename pattern of the zipped .csv file that
+\item{metaDataPattern}{a filename pattern of the zipped .csv file that
 contains spatial coords. Default value is \code{"cells.csv.gz"}, and there is no
 need to change.}
 
-\item{coord_names}{a vector of two strings specify the spatial coord names.
+\item{coordNames}{a vector of two strings specify the spatial coord names.
 Default value is \code{c("x_centroid", "y_centroid")}, and there is no need to change.}
 }
 \value{
@@ -66,11 +66,11 @@ list.files(xepath)
 
 # One of the following depending on your input (.h5 or folder) and output 
 # (`SPE` or `SCE`) requirement.
-xe_spe <- readXeniumSXE(dirname = xepath)
+xe_spe <- readXeniumSXE(dirName = xepath)
 \dontrun{
-xe_spe <- readXeniumSXE(dirname = xepath, countmatfpattern = "cell_feature_matrix")
+xe_spe <- readXeniumSXE(dirName = xepath, countMatPattern = "cell_feature_matrix")
 }
-xe_sce <- readXeniumSXE(dirname = xepath, return_type = "SCE")
+xe_sce <- readXeniumSXE(dirName = xepath, returnType = "SCE")
 
 # Subset to no control genes, and the same needed for `xe_sce` if read in as 
 # `SCE`.

@@ -19,11 +19,11 @@ test_that("needed files contains spatial columns of interest", {
 })
 
 test_that("data are read correctly to SpatialExperiment class", {
-  x <- readSeqfishSXE(dirname = dir, 
-                       return_type = "SPE",
-                       countmatfpattern = "CellxGene.csv", 
-                       metadatafpattern = "CellCoordinates.csv", 
-                       coord_names = c("center_x", "center_y"))
+  x <- readSeqfishSXE(dirName = dir, 
+                       returnType = "SPE",
+                       countMatPattern = "CellxGene.csv", 
+                       metaDataPattern = "CellCoordinates.csv", 
+                       coordNames = c("center_x", "center_y"))
   
   expect_s4_class(x, "SpatialExperiment")
   expect_true(all(colnames(SpatialExperiment::spatialCoords(x)) == c("center_x", "center_y")))
@@ -34,11 +34,11 @@ test_that("data are read correctly to SpatialExperiment class", {
 })
 
 test_that("data are read correctly to SingleCellExperiment class", {
-  x <- readSeqfishSXE(dirname = dir, 
-                       return_type = "SCE",
-                       countmatfpattern = "CellxGene.csv", 
-                       metadatafpattern = "CellCoordinates.csv", 
-                       coord_names = c("center_x", "center_y"))
+  x <- readSeqfishSXE(dirName = dir, 
+                       returnType = "SCE",
+                       countMatPattern = "CellxGene.csv", 
+                       metaDataPattern = "CellCoordinates.csv", 
+                       coordNames = c("center_x", "center_y"))
   
   expect_s4_class(x, "SingleCellExperiment")
   expect_true(all(c("center_x", "center_y") %in% colnames(SingleCellExperiment::colData(x))))
