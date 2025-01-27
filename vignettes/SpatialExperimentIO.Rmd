@@ -45,55 +45,52 @@ library(SpatialExperiment)
 -   For Xenium data:
 
 ```{r, eval=FALSE}
-# ### DO NOT RUN. Example code.
-# xepath <- "/path/to/folder"
-# # a. Xenium as SPE
-# xe_spe <- readXeniumSXE(dirName = xepath)
-# #    Subset to no control genes
-# xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
-# 
-# # b. Xenium as SCE
-# xe_sce <- readXeniumSXE(dirName = xepath, returnType = "SCE")
-# #    Subset to no control genes
-# xe_sce <- xe_sce[rowData(xe_sce)$Type == "Gene Expression"]
+### DO NOT RUN. Example code.
+xepath <- "/path/to/folder"
+# Xenium as SPE, or SCE by setting `returnType = "SCE"`.
+xe_spe <- readXeniumSXE(dirName = xepath,
+                        addExperimentXenium = TRUE, addParquetPaths = TRUE,
+                        altExps = c(negprobe="^NegControlProbe", antisense = "^antisense",
+                                    negcode="^NegControlCodeword", blank = "^BLANK"))
 ```
 
 -   For CosMx data:
 
 ```{r, eval=FALSE}
-# ### DO NOT RUN. Example code.
-# cospath <- "/path/to/folder"
-# # a. CosMx as SPE
-# cos_spe <- readCosmxSXE(dirName = cospath)
-# 
-# # b. CosMx as SCE
-# cos_sce <- readCosmxSXE(dirName = cospath, returnType = "SCE")
+### DO NOT RUN. Example code.
+cospath <- "/path/to/folder"
+# CosMx as SPE, or SCE by setting `returnType = "SCE"`.
+cos_spe <- readCosmxSXE(dirName = cospath,
+                        loadFovPos = TRUE, addParquetPaths = TRUE,
+                        altExps = c(negprobe="^Neg", falsecode="^Sys"))
 ```
 
 -   For MERSCOPE data:
 
 ```{r, eval=FALSE}
-# ### DO NOT RUN. Example code.
-# merpath <- "/path/to/folder"
-# # a. MERSCOPE as SPE
-# mer_spe <- readMerscopeSXE(dirName = merpath)
-# 
-# # b. MERSCOPE as SCE
-# mer_sce <- readMerscopeSXE(dirName = merpath, returnType = "SCE")
-
+### DO NOT RUN. Example code.
+merpath <- "/path/to/folder"
+# MERSCOPE as SPE, or SCE by setting `returnType = "SCE"`.
+mer_spe <- readMerscopeSXE(dirName = merpath)
 ```
+
+-   For STARmap PLUS data:
+
+```{r, eval=FALSE}
+### DO NOT RUN. Example code.
+starpath <- "/path/to/folder"
+# STARmapPLUS as SPE, or SCE by setting `returnType = "SCE"`.
+star_spe <- readStarmapplusSXE(dirName = starpath)
+```
+
 
 -   For seqFISH data:
 
 ```{r, eval=FALSE}
-# ### DO NOT RUN. Example code.
-# seqfpath <- "/path/to/folder"
-# # a. seqFISH as SPE
-# seqf_spe <- readSeqfishSXE(dirName = merpath)
-# 
-# # b. seqFISH as SCE
-# seqf_sce <- readSeqfishSXE(dirName = merpath, returnType = "SCE")
-
+### DO NOT RUN. Example code.
+seqfpath <- "/path/to/folder"
+# seqFISH as SPE, or SCE by setting `returnType = "SCE"`.
+seqf_spe <- readSeqfishSXE(dirName = merpath)
 ```
 
 That is pretty much all you need. To learn more details, please read the below sections for each technology.
@@ -104,7 +101,7 @@ That is pretty much all you need. To learn more details, please read the below s
 
 Xenium is an imaging-based in-situ sequencing technology developed by 10x Genomics. Compared to the full transcriptome coverage sequencing-based technology Visium, Xenium allows for transcript-level resolution count detection but with less genes. The transcripts are segmented into single cells and `SpatialExperimentIO` returns the cell-level `SPE` or `SCE` object. To read more about Xenium technology workflow, please refer to the [Xenium technology overview](https://www.10xgenomics.com/blog/spatially-resolved-transcriptomics-an-introductory-overview-of-spatial-gene-expression-profiling-methods). For more publicly available Xenium data, please refer to [Xenium data download](https://www.10xgenomics.com/datasets?query=Xenium&page=1&configure%5BhitsPerPage%5D=50&configure%5BmaxValuesPerFacet%5D=1000).
 
-The object constructor assumes the downloaded unzipped Xenium Output Bundle contains the mandatory file of `cells.csv.gz` and either a folder `/cell_feature_matrix` or a .h5 file `cell_feature_matrix.h5`.
+The object constructor assumes the downloaded unzipped Xenium Output Bundle contains the mandatory file of `cells.parquet` and either a folder `/cell_feature_matrix` or a .h5 file `cell_feature_matrix.h5`.
 
 ```{r}
 xepath <- system.file(
@@ -116,25 +113,49 @@ list.files(xepath)
 
 ## Read Xenium as a `SpatialExperiment` object
 
-We commented out the default specification of each variable in `readXeniumSXE()`. To read in Xenium as a `SpatialExperiment` object, you would only need to provide a valid directory name.
+We commented out the default specification of each variable in `readXeniumSXE()`. To read in Xenium as a `SpatialExperiment` object with just count matrix and column data, you would only need to provide a valid directory name.
 
 ```{r}
 # # read the count matrix .h5 file - automatically DropletUtils::read10xCounts(type = "HDF5")
-# xe_spe <- readXeniumSXE(dirName = xepath, 
+# xe_spe <- readXeniumSXE(dirName = xe_path, 
 #                         returnType = "SPE",
-#                         countMatPattern = "cell_feature_matrix.h5", 
-#                         metaDataPattern = "cells.csv.gz", 
-#                         coordNames = c("x_centroid", "y_centroid"))
+#                         countMatPattern = "cell_feature_matrix.h5",
+#                         metaDataPattern = "cells.parquet",
+#                         coordNames = c("x_centroid", "y_centroid"), 
+#                         addExperimentXenium = FALSE, # set to TRUE to load experiment.xenium
+#                         altExps = NULL, # possible value c(negprobe="^NegControlProbe", antisense = "^antisense", 
+#                                                            negcode="^NegControlCodeword", blank = "^BLANK")
+#                         addParquetPaths = FALSE, # set TRUE to load all .parquet below
+#                         ...) # takes arguments as below
+# xe_spe <- addParquetPathsXenium(sxe = xe_spe, 
+#                                 dirName = xe_path,
+#                                 loadTx = TRUE,
+#                                 txMetaNames = "transcripts",
+#                                 txPattern = "transcripts.parquet", 
+#                                 loadCellBound = TRUE,
+#                                 cellBoundMetaNames = "cell_boundaries",
+#                                 cellBoundPattern = "cell_boundaries.parquet", 
+#                                 loadNucBound = TRUE,
+#                                 NucBoundMetaNames = "nucleus_boundaries",
+#                                 NucBoundPattern = "nucleus_boundaries.parquet")
 
 xe_spe <- readXeniumSXE(dirName = xepath)
 xe_spe
 ```
 
-Additionally, Xenium gives four types of genes in their gene panel (check with `table(rowData(xe_spe)$Type)` to see). You should subset to gene types that are `"Gene Expression"` to focus on non-control genes for downstream analysis. In this example, we obtain a Xenium dataset with 4 genes all with type of `"Gene Expression"` and 6 cells just for illustration.
+Additionally, Xenium gives different control genes in their gene panel (check with `altExpNames(xe_spe)` to see). In this mini example, we obtain a Xenium dataset with 4 genes all with type of `"Gene Expression"` and 6 cells just for illustration. 
 
 ```{r}
-# Subset to no control genes                         
-xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
+table(rowData(xe_spe)$Type)
+```
+In a real Xenium data download, possible `altExp(xe_spe)` for Xenium can be the following categories, depending on the experiment setup. In the below example, we also add `experiment.xenium` to `metaata()`. We add any other .parquet files (`cell_boundaries.parquet`, `nucleus_boundaries.parquet`), except `transcripts.parquet`, to the `metadata()`. You can control what path to add with additional boolean arguments - `loadTx`, `loadCellBound`, `loadNucBound`. See the documentation for the helper function `addParquetPathsXenium()`.
+
+```{r}
+xe_spe <- readXeniumSXE(xepath,
+                        addExperimentXenium = TRUE,
+                        altExps = c(negprobe="^NegControlProbe", antisense = "^antisense", negcode="^NegControlCodeword", blank = "^BLANK"),
+                        addParquetPaths = TRUE,
+                        loadTx = FALSE)
 xe_spe
 ```
 
@@ -151,9 +172,6 @@ For this example, we only provide `cell_feature_matrix.h5` for demonstration. Ho
 # # or read the count matrix folder - automatically DropletUtils::read10xCounts(type = "sparse") 
 # xe_spe <- readXeniumSXE(dirName = xepath, 
 #                         countMatPattern = "cell_feature_matrix")
-# # Subset to no control genes                         
-# xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
-# xe_spe
 ```
 
 ## Read Xenium as a `SingleCellExperiment` object
@@ -162,7 +180,6 @@ Instead, if you are interested in storing the `spatialCoords()` columns in `colD
 
 ```{r}
 xe_sce <- readXeniumSXE(dirName = xepath, returnType = "SCE")
-xe_sce <- xe_sce[rowData(xe_sce)$Type == "Gene Expression"]
 xe_sce
 ```
 
@@ -191,14 +208,37 @@ list.files(cospath)
 We commented out the default specification of each variable in `readCosmxSXE()`. To read in CosMx as a `SpatialExperiment` object, you would only need to provide a valid directory name. With this example dataset, we obtained a CosMx `SPE` object with 8 genes and 9 cells.
 
 ```{r}
-# cos_spe <- readCosmxSXE(dirName = cospath,
+# cos_spe <- readCosmxSXE(dirName = cospath, 
 #                         returnType = "SPE",
-#                         countMatPattern = "exprMat_file.csv",
-#                         metaDataPattern = "metadata_file.csv",
-#                         coordNames = c("CenterX_global_px",
-#                                         "CenterY_global_px"))
+#                         countMatPattern = "exprMat_file.csv", 
+#                         metaDataPattern = "metadata_file.csv", 
+#                         coordNames = c("CenterX_global_px", "CenterY_global_px"),
+#                         loadFovPos = FALSE, # set to TRUE to add fov position columns to colData()
+#                         fovPosPattern = "fov_positions_file.csv",
+#                         altExps = NULL, # possible value c(negprobe="^Neg", falsecode="^Sys")
+#                         addParquetPaths = FALSE, # set TRUE to load all .parquet below
+#                         ...) # takes arguments as below
+# cos_spe <- addParquetPathsCosMx(sxe = cos_spe,
+#                                 dirName = cospath, 
+#                                 loadTx = TRUE,
+#                                 txMetaNames = "transcripts",
+#                                 txPattern = "tx_file.csv", 
+#                                 loadPolygon = TRUE,
+#                                 polygonMetaNames = "polygons",
+#                                 polygonPattern = "polygons.csv")
 
 cos_spe <- readCosmxSXE(dirName = cospath)
+cos_spe
+```
+
+Here is a demonstration of loading all recommended files as path to parquet in the `metadata()`, except polygons. 
+
+```{r}
+cos_spe <- readCosmxSXE(cospath,
+                        loadFovPos = TRUE,
+                        altExps = c(negprobe="^Neg", falsecode="^Sys"),
+                        addParquetPaths = TRUE,
+                        loadPolygon = FALSE)
 cos_spe
 ```
 

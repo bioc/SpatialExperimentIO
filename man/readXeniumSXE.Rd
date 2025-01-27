@@ -10,14 +10,10 @@ readXeniumSXE(
   countMatPattern = "cell_feature_matrix.h5",
   metaDataPattern = "cells.parquet",
   coordNames = c("x_centroid", "y_centroid"),
-  loadTx = FALSE,
-  txPattern = "transcripts.parquet",
-  loadCellBound = FALSE,
-  cellBoundPattern = "cell_boundaries.parquet",
-  loadNucBound = FALSE,
-  nucBoundPattern = "nucleus_boundaries.parquet",
-  addExperimentXenium = TRUE,
-  altExps = NULL
+  addExperimentXenium = FALSE,
+  altExps = NULL,
+  addParquetPaths = FALSE,
+  ...
 )
 }
 \arguments{
@@ -39,6 +35,14 @@ need to change.}
 
 \item{coordNames}{a vector of two strings specify the spatial coord names.
 Default value is \code{c("x_centroid", "y_centroid")}, and there is no need to change.}
+
+\item{addExperimentXenium}{to add experiment.xenium parameters to \code{metadata(sxe)} or not.
+Default value is FALSE.}
+
+\item{altExps}{}
+
+\item{addParquetPaths}{Default value is FALSE,
+\code{loadTx}, \code{txMetaNames}, \code{txPattern}, \code{loadCellBound}, \code{cellBoundMetaNames}, \code{cellBoundPattern}, \code{loadNucBound}, \code{NucBoundMetaNames}, \code{NucBoundPattern}}
 }
 \value{
 a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object
@@ -57,7 +61,14 @@ Xenium_unzipped \cr
 · · | - barcodes.tsv.gz \cr
 · · | - features.tsv.gz \cr
 · · | - matrix.mtx.gz \cr
-· | — cells.csv.gz \cr
+· | — cells.parquet \cr
+
+Optional files to add to the metadata() as a list of paths (will be converted to parquet):
+· | — transcripts.parquet \cr
+· | — cell_boundaries.parquet \cr
+· | — nucleus_boundaries.parquet \cr
+· | — experiment.xenium \cr
+See addParquetPathsXenium()
 }
 \examples{
 # A relatively small data set is the Xenium mouse brain data that can be 
@@ -80,12 +91,8 @@ xe_spe <- readXeniumSXE(dirName = xepath, countMatPattern = "cell_feature_matrix
 }
 xe_sce <- readXeniumSXE(dirName = xepath, returnType = "SCE")
 
-# Subset to no control genes, and the same needed for `xe_sce` if read in as 
-# `SCE`.
-\dontrun{
-xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
-c(negprobe="^NegControlProbe", negcode="^NegControlCodeword", unassigncode = "^UnassignedCodeword")
-}
+xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE)
+xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE, loadNucBound = FALSE)
 
 }
 \author{

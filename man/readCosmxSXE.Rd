@@ -10,13 +10,11 @@ readCosmxSXE(
   countMatPattern = "exprMat_file.csv",
   metaDataPattern = "metadata_file.csv",
   coordNames = c("CenterX_global_px", "CenterY_global_px"),
-  loadTx = FALSE,
-  txPattern = "tx_file.csv",
-  loadPolygon = FALSE,
-  polygonPattern = "polygons.csv",
   loadFovPos = FALSE,
   fovPosPattern = "fov_positions_file.csv",
-  altExps = NULL
+  altExps = NULL,
+  addParquetPaths = FALSE,
+  ...
 )
 }
 \arguments{
@@ -35,6 +33,25 @@ there is no need to change.}
 \item{coordNames}{a vector of two strings specify the spatial coord names.
 Default value is \code{c("CenterX_global_px", "CenterY_global_px")}, and
 there is no need to change.}
+
+\item{loadFovPos}{to merge fov_position_list.csv to \code{colData(sxe)} or not.
+Default is FALSE.}
+
+\item{fovPosPattern}{.csv pattern of fov_position_list.csv files in the raw download.
+Default value is \code{"fov_positions_file.csv"}.}
+
+\item{altExps}{gene names contains these strings will be moved to \code{altExps(sxe)}
+as list of separate sxe. Default is NULL. Suggest \code{c(negprobe="^Neg", falsecode="^Sys")}.}
+
+\item{addParquetPaths}{to add parquet paths to \code{metadata(sxe)} or not. If TRUE,
+transcripts and polygon .csv files will be converted to .parquet, and the paths
+will be added. If, for instance, no polygon file is available, and only transcript
+file is available, please set this argument to TRUE and adjust loadPolygon = FALSE
+in the \code{...} argument.}
+
+\item{...}{extra parameters to pass to addParquetPathsCosMx(), including
+\code{loadTx}, \code{txMetaNames}, \code{txPattern}, \code{loadPolygon}, \code{polygonMetaNames},
+\code{polygonPattern}.}
 }
 \value{
 a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object
@@ -49,6 +66,12 @@ structure, with two mandatory files:
 CosMx_unzipped/optional_default_folder/ \cr
 · | — *_exprMat_file.csv \cr
 · | — *_metadata_file.csv \cr
+
+Optional files to add to the metadata() as a list of paths (will be converted to parquet):
+· | — *_tx_file.csv \cr
+· | — *_polygons.csv \cr
+· | — *_fov_positions_file.csv \cr
+See addParquetPathsCosmx()
 }
 \examples{
 # A relatively small data download can be from:
@@ -67,6 +90,8 @@ list.files(cospath)
 # One of the following depending on your output (`SPE` or `SCE`) requirement.
 cos_spe <- readCosmxSXE(dirName = cospath)
 cos_sce <- readCosmxSXE(dirName = cospath, returnType = "SCE")
+cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = TRUE)
+cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = TRUE, loadPolygon = FALSE)
 
 
 }

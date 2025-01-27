@@ -68,7 +68,7 @@ csvToParquetPaths <- function(dirName, filepath = tx_csv_path){
 #' Add parquet paths to metadata for transcripts, polygon, or cell/nucleus boundaries.
 #'
 #' @param sxe a SPE or SCE object to add parquet to `metadata(sxe)`.
-#' #' @param dirName the directory that stores the transcripts/polygon/cell_boundaries 
+#' @param dirName the directory that stores the transcripts/polygon/cell_boundaries 
 #' .csv or .parquet files.
 #' @param metaNames  a vector of names to `metadata(sxe)[[]]`. The length must
 #' match number of files detected with filePattern provided. 
