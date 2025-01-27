@@ -13,10 +13,14 @@
 #' @return 
 #' @export
 #'
-#' @examples countmat_file <- .sanityCheck(tech, filetype = "count matrix", 
-#'                                         expectfilename = "`exprMat_file.csv`", 
-#'                                         dirName = dirName, 
-#'                                         filepatternvar = countMatPattern)
+#' @examples 
+#' dir <- system.file(file.path("extdata", "CosMx_small"),
+#'                    package = "SpatialExperimentIO")
+#' countmat_file <- .sanityCheck(tech = "CosMx", filetype = "count matrix",
+#'                               expectfilename = "`exprMat_file.csv`",
+#'                               dirName = dir,
+#'                               filepatternvar = "exprMat_file.csv")
+#'
 .sanityCheck <- function(tech, filetype, expectfilename, dirName, filepatternvar){
   if(!any(file.exists(file.path(dirName, list.files(dirName, filepatternvar))))){
     stop(paste(tech, filetype , "file does not exist in the directory. Expect", expectfilename, "in", "`dirName`"))
@@ -35,26 +39,27 @@
 #' If transcripts or polygon is expected to be loaded, write a parquet file to 
 #' the current data download (if not already), and return the file path to .parquet
 #'
-#' @param dirName Current directory of data download
-#' @param filepath Path to transcripts or polygons csv
+#' @param dirName current directory of data download
+#' @param filepath path to transcripts or polygons csv
 #'
 #' @author Yixing Estella Dong
 #'
 #' @return a path to .parquet
 #' @export 
 #'
-#' @examples tx_parquet_path <- .getParquetPath(dirName = dirName, 
-#'                                                filepath = tx_csv_file)
+#' @examples 
+#' dir <- system.file(file.path("extdata", "CosMx_small"),
+#'                    package = "SpatialExperimentIO")
+#' tx_csv_path <- file.path(dir, "lung_p9s1_tx_file.csv")
+#' tx_parquet_path <- csvToParquetPaths(dirName, filepath = tx_csv_path)
+#' 
 #' @importFrom data.table fread
 #' @importFrom arrow write_parquet
-#' @examples countmat_file <- .sanityCheck(tech, filetype = "count matrix", 
-#'                                         expectfilename = "`exprMat_file.csv`", 
-#'                                         dirName = dirName, 
-#'                                         filepatternvar = countMatPattern)
-csvToParquetPaths <- function(dirName, filepath = tx_csv_file){
+#' 
+csvToParquetPaths <- function(dirName, filepath = tx_csv_path){
   parquet_path <- paste0(gsub(".csv", "", filepath), ".parquet")
-  write_parquet(as.data.frame(fread(filepath)), parquet_path)
-  
+  if(!file.exists(parquet_path)) write_parquet(as.data.frame(fread(filepath)), parquet_path)
+
   return(parquet_path)
 }
 
@@ -66,20 +71,26 @@ csvToParquetPaths <- function(dirName, filepath = tx_csv_file){
 #' #' @param dirName the directory that stores the transcripts/polygon/cell_boundaries 
 #' .csv or .parquet files.
 #' @param metaNames  a vector of names to `metadata(sxe)[[]]`. The length must
-#' match number of files detected with filePattern provided. e.g. c("transcripts", "transcripts1.csv").
+#' match number of files detected with filePattern provided. 
+#' \code{e.g. c("transcripts", "transcripts1.csv")}.
 #' @param filePattern a vector of file patterns to search in the current directory. 
-#' e.g. c("tx_file.csv", "tx_file1.csv")
+#' e.g. \code{c("tx_file.csv", "tx_file1.csv")}.
 #'
 #' @return a SPE or SCE object with parquet paths added to metadata
 #' @export 
 #'
 #' @examples
+#' 
+#' dir <- system.file(file.path("extdata", "CosMx_small"),
+#'                    package = "SpatialExperimentIO")
+#' sxe <- readCosmxSXE(dir)
+#' sxe <- addParquetPathToMeta(sxe,
+#'                             dirName = dir,
+#'                             metaNames = "transcripts",
+#'                             filePattern = "tx_file.parquet")
+#' 
 #' @importFrom purrr walk2
 #' 
-#' @examples countmat_file <- .sanityCheck(tech, filetype = "count matrix", 
-#'                                         expectfilename = "`exprMat_file.csv`", 
-#'                                         dirName = dirName, 
-#'                                         filepatternvar = countMatPattern)
 addParquetPathToMeta <- function(sxe, 
                                  dirName = dirName,
                                  metaNames = "transcripts",
@@ -111,7 +122,7 @@ addParquetPathToMeta <- function(sxe,
     }
   }
   
-  purrr::walk2(metaNames, parquet_paths, function(name, path) {
+  walk2(metaNames, parquet_paths, function(name, path) {
     metadata(sxe)[[name]] <<- path
   })
   

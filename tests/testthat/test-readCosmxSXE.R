@@ -2,7 +2,7 @@ dir <- system.file(
   file.path("extdata", "CosMx_small"), 
   package="SpatialExperimentIO")
 # dir <- "~/Desktop/SpatialExperimentIO/inst/extdata/CosMx_small"
-dir <- "~/Downloads/Pancreas_CosMx_WTX"
+# dir <- "~/Downloads/Pancreas_CosMx_WTX"
 # dir <- "~/Downloads/HumanFC"
 # dir <- "~/Downloads/Lung9_Rep1"
 

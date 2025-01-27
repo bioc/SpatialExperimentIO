@@ -76,6 +76,7 @@
 #' @importFrom methods as
 #' @importFrom data.table fread
 #' @importFrom arrow write_parquet
+#' 
 readCosmxSXE <- function(dirName = dirName, 
                          returnType = "SPE",
                          countMatPattern = "exprMat_file.csv", 

@@ -80,6 +80,7 @@
 #' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
 #' @importFrom methods as
 #' @importFrom arrow read_parquet read_json_arrow
+#' 
 readXeniumSXE <- function(dirName, 
                           returnType = "SPE",
                           countMatPattern = "cell_feature_matrix.h5",

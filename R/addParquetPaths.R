@@ -1,3 +1,5 @@
+#' Add CosMx-related parquet paths to metadata for transcripts, polygon, or cell/nucleus boundaries.
+#' 
 #' @param sxe a SPE or SCE Xenium object to add parquet to `metadata(sxe)`.
 #' @param dirName the directory that stores the transcripts/polygon 
 #' .csv or .parquet files.
@@ -32,7 +34,6 @@
 #' sxe <- readCosmxSXE(dirName = cospath, addParquetPaths = FALSE)
 #' sxe <- addParquetPathsCosMx(sxe, dirName = cospath)
 #'
-#' @importFrom 
 addParquetPathsCosMx <- function(sxe,
                                  dirName, 
                                  loadTx = TRUE,
@@ -56,7 +57,8 @@ addParquetPathsCosMx <- function(sxe,
 }
 
 
-
+#' Add Xenium-related parquet paths to metadata for transcripts or cell/nucleus boundaries.
+#' 
 #' @param sxe a SPE or SCE Xenium object to add parquet to `metadata(sxe)`.
 #' @param dirName the directory that stores the transcripts/cell_boundaries/nucleus_boundaries 
 #' .parquet files.
@@ -100,7 +102,6 @@ addParquetPathsCosMx <- function(sxe,
 #' sxe <- readXeniumSXE(dirName = xepath, addParquetPaths = FALSE)
 #' sxe <- addParquetPathsXenium(sxe, dirName = xepath)
 #'
-#' @importFrom 
 addParquetPathsXenium <- function(sxe, 
                                   dirName,
                                   loadTx = TRUE,

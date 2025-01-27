@@ -2,8 +2,8 @@ dir <- system.file(
   file.path("extdata", "Xenium_small"), 
   package="SpatialExperimentIO")
 # dir <- "~/Desktop/SpatialExperimentIO/inst/extdata/Xenium_small"
-dir <- "~/Downloads/BC_data/Xenium_rep2"
-dir <- "~/Downloads/CRC_data/Xenium"
+# dir <- "~/Downloads/BC_data/Xenium_rep2"
+# dir <- "~/Downloads/CRC_data/Xenium"
 
 test_that("example data folders uniquely contains needed files", {
   expect_true("cell_feature_matrix.h5" %in% list.files(dir))

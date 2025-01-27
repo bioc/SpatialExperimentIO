@@ -19,7 +19,7 @@ Imports:
   SingleCellExperiment,
   methods,
   data.table,
-  arrow
+  arrow,
   purrr
 Suggests: 
   knitr, 
