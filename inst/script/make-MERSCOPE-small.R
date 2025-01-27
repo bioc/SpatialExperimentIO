@@ -1,7 +1,7 @@
 ################################################################################
 # Script to create a small count matrix and a small coordinate files 
 # from the raw download of the Merscope human ovarian cancer
-# patient 1 slice 2.
+# patient 2 slice 1.
 # Yixing Dong, updated Aug 2024
 ################################################################################
 
@@ -19,8 +19,8 @@
 # Put the downloaded unzipped file into a folder. Make sure that two mandatory 
 # files do exist. 
 
-mer_lung_p1s2_path <- here::here("raw_data/mer_patient1slice2")
-mer_folder <- list.files(mer_lung_p1s2_path, pattern = ".csv")
+mer_ova_p1s2_path <- here::here("raw_data/mer_patient1slice2")
+mer_folder <- list.files(mer_ova_p1s2_path, pattern = ".csv")
 mer_folder
 
 
@@ -28,8 +28,8 @@ mer_folder
 # Read in raw data
 # -------------
 
-counts <- read.csv(file.path(mer_lung_p1s2_path, "OvarianP2S1_cell_by_gene.csv")) # 91992   982
-meta <- read.csv(file.path(mer_lung_p1s2_path, "OvarianP2S1_cell_metadata.csv"))  # 91972    20
+counts <- read.csv(file.path(mer_ova_p1s2_path, "OvarianP2S1_cell_by_gene.csv")) # 91992   982
+meta <- read.csv(file.path(mer_ova_p1s2_path, "OvarianP2S1_cell_metadata.csv"))  # 91972    20
 
 
 # -------------

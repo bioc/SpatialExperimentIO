@@ -60,26 +60,11 @@ readSeqfishSXE <- function(dirName = dirName,
                            coordNames = c("center_x", "center_y")){
   
   returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  tech <- "Seqfish"
   
-  ## Metadata sanity check 
-  if(!any(file.exists(file.path(dirName, list.files(dirName, metaDataPattern))))){
-    stop("seqFISH metadata file does not exist in the directory. Expect 'CellCoordinates.csv' in `dirName`")
-  }
-  
-  metadata_file <- file.path(dirName, list.files(dirName, metaDataPattern))
-  if(length(metadata_file) > 1){
-    stop("More than one metadata file possible with the provided pattern `metaDataPattern`")
-  }
-  
-  ## Count matrix sanity check
-  if(!any(file.exists(file.path(dirName, list.files(dirName, countMatPattern))))){
-    stop("seqFISH count matrix does not exist in the directory. Expect 'CellxGene.csv' in `dirName`")
-  }
-  
-  countmat_file <- file.path(dirName, list.files(dirName, countMatPattern))
-  if(length(countmat_file) > 1){
-    stop("More than one count matrix file possible with the provided pattern `countMatPattern`")
-  }
+  # Sanity checks
+  countmat_file <- .sanityCheck(tech, filetype = "count matrix", expectfilename = "`CellxGene.csv`", dirName = dirName, filepatternvar = countMatPattern)
+  metadata_file <- .sanityCheck(tech, filetype = "metadata", expectfilename = "`CellCoordinates.csv`", dirName = dirName, filepatternvar = metaDataPattern)
   
   # Read in 
   countmat <- read.csv(countmat_file)

@@ -52,3 +52,17 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 .Rproj.user
+
+/inst/.DS_Store
+
+# Parquet files
+/inst/extdata/CosMx_small/tx_file.parquet
+
+
+
+
+
+
+
+
+

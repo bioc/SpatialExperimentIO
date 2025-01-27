@@ -8,8 +8,16 @@ readXeniumSXE(
   dirName,
   returnType = "SPE",
   countMatPattern = "cell_feature_matrix.h5",
-  metaDataPattern = "cells.csv.gz",
-  coordNames = c("x_centroid", "y_centroid")
+  metaDataPattern = "cells.parquet",
+  coordNames = c("x_centroid", "y_centroid"),
+  loadTx = FALSE,
+  txPattern = "transcripts.parquet",
+  loadCellBound = FALSE,
+  cellBoundPattern = "cell_boundaries.parquet",
+  loadNucBound = FALSE,
+  nucBoundPattern = "nucleus_boundaries.parquet",
+  addExperimentXenium = TRUE,
+  altExps = NULL
 )
 }
 \arguments{
@@ -76,6 +84,7 @@ xe_sce <- readXeniumSXE(dirName = xepath, returnType = "SCE")
 # `SCE`.
 \dontrun{
 xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
+c(negprobe="^NegControlProbe", negcode="^NegControlCodeword", unassigncode = "^UnassignedCodeword")
 }
 
 }

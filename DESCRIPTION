@@ -18,7 +18,9 @@ Imports:
   SpatialExperiment,
   SingleCellExperiment,
   methods,
-  utils
+  data.table,
+  arrow
+  purrr
 Suggests: 
   knitr, 
   rmarkdown, 

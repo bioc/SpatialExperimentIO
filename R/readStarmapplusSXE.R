@@ -60,26 +60,11 @@ readStarmapplusSXE <- function(dirName = dirName,
                                coordNames = c("X", "Y", "Z")){
   
   returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  tech <- "Starmapplus"
   
-  ## Metadata sanity check 
-  if(!any(file.exists(file.path(dirName, list.files(dirName, metaDataPattern))))){
-    stop("STARmap PLUS metadata file does not exist in the directory. Expect 'spatial.csv' in `dirName`")
-  }
-  
-  metadata_file <- file.path(dirName, list.files(dirName, metaDataPattern))
-  if(length(metadata_file) > 1){
-    stop("More than one metadata file possible with the provided pattern `metaDataPattern`")
-  }
-  
-  ## Count matrix sanity check
-  if(!any(file.exists(file.path(dirName, list.files(dirName, countMatPattern))))){
-    stop("STARmap PLUS count matrix does not exist in the directory. Expect 'raw_expression_pd.csv' in `dirName`")
-  }
-  
-  countmat_file <- file.path(dirName, list.files(dirName, countMatPattern))
-  if(length(countmat_file) > 1){
-    stop("More than one count matrix file possible with the provided pattern `countMatPattern`")
-  }
+  # Sanity checks
+  countmat_file <- .sanityCheck(tech, filetype = "count matrix", expectfilename = "`raw_expression_pd.csv`", dirName = dirName, filepatternvar = countMatPattern)
+  metadata_file <- .sanityCheck(tech, filetype = "metadata", expectfilename = "`spatial.csv`", dirName = dirName, filepatternvar = metaDataPattern)
   
   # Read in 
   countmat <- read.csv(countmat_file)

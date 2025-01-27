@@ -208,11 +208,53 @@ library(ggspavis)
 
 # read the small .h5 and cells.csv.gz as SPE object, and plot it. 
 
-spe <- readXeniumSXE("~/Desktop/SpatialExperimentIO/inst/extdata/Xenium_small/", return_type = "SPE")
+spe <- readXeniumSXE(dirName = "~/Desktop/SpatialExperimentIO/inst/extdata/Xenium_small/", returnType = "SPE")
 plotSpots(spe, annotate = "total_counts", in_tissue = NULL)
 
 
+sce <- DropletUtils::read10xCounts("~/Desktop/SpatialExperimentIO/inst/extdata/Xenium_small/cell_feature_matrix.h5", 
+                                   type = "HDF5", col.names = TRUE)
+
+rownames(sce) <- rowData(sce)$Symbol
+
+four_genes <- c("ABCC11", "ACTA2", "ACTG2", "ADAM9")
+six_cells <- 1:6
 
 
+# -------------
+# Create small nucleus boundaries
+# -------------
+filepaths <- "~/Downloads/BC_data/Xenium_rep1/"
+nucboundname <- "nucleus_boundaries.parquet"
+cellboundname <- "cell_boundaries.parquet"
+txname <- "transcripts.parquet"
+cellsname <- "cells.parquet"
 
+xe_small_path <- "~/Desktop/SpatialExperimentIO/inst/extdata/Xenium_small"
+
+nucbound <- arrow::read_parquet(file.path(filepaths, nucboundname))
+nucbound_test <- nucbound %>% filter(cell_id %in% six_cells)
+arrow::write_parquet(nucbound_test, file.path(xe_small_path, nucboundname))  
+
+cellbound <- arrow::read_parquet(file.path(filepaths, cellboundname))
+cellbound_test <- cellbound %>% filter(cell_id %in% six_cells)
+arrow::write_parquet(cellbound_test, file.path(xe_small_path, cellboundname))  
+
+tx <- arrow::read_parquet(file.path(filepaths, txname), as_data_frame=FALSE)
+tx <- tx |>
+  mutate(feature_name=as.character(feature_name)) |>
+  mutate(transcript_id=as.numeric(transcript_id)) |>
+  as.data.frame()
+tx_test <- tx %>% filter(cell_id %in% six_cells & feature_name %in% four_genes)
+arrow::write_parquet(tx_test, file.path(xe_small_path, txname))  
+
+cells <- arrow::read_parquet(file.path(filepaths, cellsname))
+cells_test <- cells %>% filter(cell_id %in% six_cells)
+arrow::write_parquet(cells_test, file.path(xe_small_path, cellsname))  
+
+## Sanity
+# extdatapath <- "~/Desktop/SpatialExperimentIO/inst/extdata/Xenium_small/"
+# tx <- arrow::read_parquet(file.path(extdatapath, txname))
+# cells <- arrow::read_parquet(file.path(extdatapath, cellsname))
+# cells <- arrow::read_parquet(file.path(extdatapath, cellsname))
 

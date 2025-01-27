@@ -21,6 +21,11 @@
 #' @param coordNames a vector of two strings specify the spatial coord names. 
 #' Default value is \code{c("x_centroid", "y_centroid")}, and there is no need to change.
 #' 
+#' @param addExperimentXenium to add experiment.xenium parameters to \code{metadata(sxe)} or not. 
+#' Default value is FALSE. 
+#' @param altExps 
+#' @param addParquetPaths Default value is FALSE,
+#' `loadTx`, `txMetaNames`, `txPattern`, `loadCellBound`, `cellBoundMetaNames`, `cellBoundPattern`, `loadNucBound`, `NucBoundMetaNames`, `NucBoundPattern`
 #'
 #' @details
 #' The constructor assumes the downloaded unzipped Xenium Output Bundle has the 
@@ -32,7 +37,14 @@
 #' · · | - barcodes.tsv.gz \cr
 #' · · | - features.tsv.gz \cr
 #' · · | - matrix.mtx.gz \cr
-#' · | — cells.csv.gz \cr
+#' · | — cells.parquet \cr
+#'
+#' Optional files to add to the metadata() as a list of paths (will be converted to parquet):
+#' · | — transcripts.parquet \cr
+#' · | — cell_boundaries.parquet \cr
+#' · | — nucleus_boundaries.parquet \cr
+#' · | — experiment.xenium \cr
+#' See addParquetPathsXenium()
 #'
 #' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
@@ -60,48 +72,34 @@
 #' }
 #' xe_sce <- readXeniumSXE(dirName = xepath, returnType = "SCE")
 #' 
-#' # Subset to no control genes, and the same needed for `xe_sce` if read in as 
-#' # `SCE`.
-#' \dontrun{
-#' xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
-#' }
+#' xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE)
+#' xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE, loadNucBound = FALSE)
 #'
 #' @importFrom DropletUtils read10xCounts
 #' @importFrom SpatialExperiment SpatialExperiment
 #' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
 #' @importFrom methods as
-#' @importFrom utils read.csv
+#' @importFrom arrow read_parquet read_json_arrow
 readXeniumSXE <- function(dirName, 
                           returnType = "SPE",
                           countMatPattern = "cell_feature_matrix.h5",
-                          metaDataPattern = "cells.csv.gz", 
-                          coordNames = c("x_centroid", "y_centroid")){
+                          metaDataPattern = "cells.parquet", # or cells.csv.gz 
+                          coordNames = c("x_centroid", "y_centroid"), 
+                          addExperimentXenium = FALSE,
+                          altExps = NULL,
+                          addParquetPaths = FALSE,
+                          ...){
 
   returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  tech <- "Xenium"
   
-  ## Metadata sanity check 
-  if(!any(file.exists(file.path(dirName, list.files(dirName, metaDataPattern))))){
-    stop("Xenium metadata file does not exist in the directory. Expect 'cells.csv.gz' in `dirName`")
-  }
-  
-  metadata_file <- file.path(dirName, list.files(dirName, metaDataPattern))
-  if(length(metadata_file) > 1){
-    stop("More than one metadata file possible with the provided pattern `metaDataPattern`")
-  }
-  
-  ## Count matrix sanity check
-  if(!any(file.exists(file.path(dirName, list.files(dirName, countMatPattern))))){
-    stop("Xenium count matrix .h5 file or directory does not exist in the directory. Expect 'cell_feature_matrix.h5' or folder `/cell_feature_matrix` in `dirName`")
-  }
-  
-  countmat_file <- file.path(dirName, list.files(dirName, countMatPattern))
-  
-  # .h5 file 
-  if(grepl(".h5", countMatPattern)){
-    if(length(countmat_file) > 1){
-      stop("More than one count matrix .h5 file possible with the provided pattern `countMatPattern`")
-    }
-  }
+  # Sanity checks
+  countmat_file <- .sanityCheck(tech, filetype = "count matrix", expectfilename = "`cell_feature_matrix.h5`", 
+                                dirName = dirName, filepatternvar = countMatPattern)
+  metadata_file <- .sanityCheck(tech, filetype = "metadata", expectfilename = "`cells.parquet` or `cells.csv.gz`", 
+                                dirName = dirName, filepatternvar = metaDataPattern)
+  if(addExperimentXenium) expxe_file <- .sanityCheck(tech, filetype = "experiment.xenium", expectfilename = "`experiment.xenium`", 
+                                                     dirName = dirName, filepatternvar = "experiment.xenium")
   
   # folder 
   if(!grepl(".h5", countMatPattern)){
@@ -113,38 +111,61 @@ readXeniumSXE <- function(dirName,
     }
     
     if(!all(c("barcodes.tsv.gz", "features.tsv.gz", "matrix.mtx.gz") %in% list.files(countmat_file))){
-      stop("For Xenium with count matrix directory input, expect '/cell_feature_matrix' folder contains files 'barcodes.tsv.gz', 'features.tsv.gz', 'matrix.mtx.gz'")
+      stop("For Xenium with count matrix directory input, expect '/cell_feature_matrix' 
+           folder contains files 'barcodes.tsv.gz', 'features.tsv.gz', 'matrix.mtx.gz'")
     }
     
   }
 
-  
   # Count matrix + rowData
   sce <- DropletUtils::read10xCounts(countmat_file, col.names = TRUE)
   
   # Spatial and metadata
-  metadata <- read.csv(gzfile(metadata_file), header = TRUE)
-  
+  if(grepl(".parquet", metaDataPattern)){
+    metadata <- as.data.frame(read_parquet(metadata_file)) 
+  }else if(grepl(".csv.gz", metaDataPattern)){
+    metadata <- read.csv(gzfile(metadata_file), header = TRUE)
+  }else{
+    stop("Expect `.parquet` or `.csv.gz` format for metadata. Please convert and 
+         save file needed first with e.g. arrow::write_parquet() or R.utils::gzip(). ")
+  }
+
   if(!all(coordNames %in% colnames(metadata))){
-    stop("`coordNames` not in columns of `metaDataPattern`. For Xenium, expect c('x_centroid', 'y_centroid') in the columns of the metadata 'cells.csv.gz'. " )
+    stop("`coordNames` not in columns of `metaDataPattern`. For Xenium, expect 
+         c('x_centroid', 'y_centroid') in the columns of the metadata 'cells.csv.gz'. " )
   }
   
   if(returnType == "SPE"){
-    # construct 'SpatialExperiment'
-    sxe <- SpatialExperiment::SpatialExperiment(
+    sxe <- SpatialExperiment(
       assays = list(counts = as(counts(sce), "dgCMatrix")),
       rowData = rowData(sce),
       colData = metadata,
       spatialCoordsNames = coordNames
     )
   }else if(returnType == "SCE"){
-    # construct 'SingleCellExperiment'
-    sxe <- SingleCellExperiment::SingleCellExperiment(
+    sxe <- SingleCellExperiment(
       assays = list(counts = as(counts(sce), "dgCMatrix")),
       rowData = rowData(sce),
       colData = metadata
     )
   }
+  rownames(sxe) <- rowData(sxe)$Symbol
   
+  if(!is.null(altExps)){
+    idx <- lapply(altExps, grep, rownames(sxe))
+    idx <- idx[vapply(idx, length, numeric(1)) > 0]
+    if(length(idx)){                              
+      alt <- lapply(idx, \(.) sxe[., ]) 
+      altExps(sxe)[names(alt)] <- alt
+      sxe <- sxe[-unlist(idx), ]
+    }
+  }
+  
+  # Experiment Xenium
+  if(addExperimentXenium) metadata(sxe)$experiment.xenium <- read_json_arrow(expxe_file)
+  
+  # Add Parquet Paths
+  if(addParquetPaths) sxe <- addParquetPathsXenium(sxe, dirName, ...)
+                                                        
   return(sxe)
 }

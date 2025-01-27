@@ -9,7 +9,14 @@ readCosmxSXE(
   returnType = "SPE",
   countMatPattern = "exprMat_file.csv",
   metaDataPattern = "metadata_file.csv",
-  coordNames = c("CenterX_global_px", "CenterY_global_px")
+  coordNames = c("CenterX_global_px", "CenterY_global_px"),
+  loadTx = FALSE,
+  txPattern = "tx_file.csv",
+  loadPolygon = FALSE,
+  polygonPattern = "polygons.csv",
+  loadFovPos = FALSE,
+  fovPosPattern = "fov_positions_file.csv",
+  altExps = NULL
 )
 }
 \arguments{

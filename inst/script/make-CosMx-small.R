@@ -55,6 +55,47 @@ cosmx_lung_p9s1_demo_path <- "~/Desktop/SpatialExperimentIO/inst/extdata/CosMx_s
 write.csv(counts_test, file.path(cosmx_lung_p9s1_demo_path, "lung_p9s1_exprMat_file.csv"), row.names = FALSE)
 write.csv(meta_test, file.path(cosmx_lung_p9s1_demo_path, "lung_p9s1_metadata_file.csv"), row.names = FALSE)
 
+# -------------
+# Downsize to 10 genes and 9 cells for transcripts 
+# -------------
+path_to_tx <- "~/Downloads/Lung9_Rep1"
+tx_cssv <- read.csv(file.path(path_to_tx, "Lung9_Rep1_tx_file.csv"))
+
+# counts_test <- read.csv(file.path(cosmx_lung_p9s1_demo_path, "lung_p9s1_exprMat_file.csv"), row.names = FALSE)
+ten_genes <- c("AATK","ABL1","ABL2","ACE","ACE2","ACKR1","ACKR3","ACKR4")
+nine_cells <- 1:9
+fov <- 10
+
+tx_cssv_test <- tx_cssv %>%
+  filter(fov == 10 & cell_ID %in% 1:9 & target %in% ten_genes)
+  
+write.csv(tx_cssv_test, file.path(cosmx_lung_p9s1_demo_path, "lung_p9s1_tx_file.csv"), row.names = FALSE) # only 1 row
+
+# add to gitignore to mimic raw file download, but use locally for testing
+arrow::write_parquet(tx_cssv_test, file.path(cosmx_lung_p9s1_demo_path, "tx_file.parquet"))  
+# tx_cssv_test <- arrow::read_parquet(file.path(cosmx_lung_p9s1_demo_path, "tx_file.parquet")) # sanity
+
+
+# -------------
+# Downsize to 10 genes and 9 cells for fov position
+# -------------
+path_to_tx <- "~/Downloads/Lung9_Rep1"
+fov_cssv <- read.csv(file.path(path_to_tx, "Lung9_Rep1_fov_positions_file.csv"))
+
+fov_cssv_test <- fov_cssv %>%
+  filter(fov == 10)
+
+write.csv(fov_cssv_test, file.path(cosmx_lung_p9s1_demo_path, "lung_p9s1_fov_positions_file.csv"), row.names = FALSE) # only 1 row
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -17,6 +17,20 @@
 #' @param coordNames a vector of two strings specify the spatial coord names. 
 #' Default value is \code{c("CenterX_global_px", "CenterY_global_px")}, and 
 #' there is no need to change.
+#' @param loadFovPos to merge fov_position_list.csv to \code{colData(sxe)} or not. 
+#' Default is FALSE.
+#' @param fovPosPattern .csv pattern of fov_position_list.csv files in the raw download. 
+#' Default value is \code{"fov_positions_file.csv"}.
+#' @param altExps gene names contains these strings will be moved to \code{altExps(sxe)} 
+#' as list of separate sxe. Default is NULL. Suggest \code{c(negprobe="^Neg", falsecode="^Sys")}. 
+#' @param addParquetPaths to add parquet paths to \code{metadata(sxe)} or not. If TRUE, 
+#' transcripts and polygon .csv files will be converted to .parquet, and the paths 
+#' will be added. If, for instance, no polygon file is available, and only transcript 
+#' file is available, please set this argument to TRUE and adjust loadPolygon = FALSE 
+#' in the \code{...} argument. 
+#' @param ... extra parameters to pass to addParquetPathsCosMx(), including 
+#' `loadTx`, `txMetaNames`, `txPattern`, `loadPolygon`, `polygonMetaNames`,
+#' `polygonPattern`.
 #' 
 #' @details
 #' The constructor assumes the downloaded unzipped CosMx folder has the following
@@ -25,6 +39,11 @@
 #' · | — *_exprMat_file.csv \cr
 #' · | — *_metadata_file.csv \cr
 #' 
+#' Optional files to add to the metadata() as a list of paths (will be converted to parquet):
+#' · | — *_tx_file.csv \cr
+#' · | — *_polygons.csv \cr
+#' · | — *_fov_positions_file.csv \cr
+#' See addParquetPathsCosmx()
 #'
 #' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
@@ -48,73 +67,93 @@
 #' # One of the following depending on your output (`SPE` or `SCE`) requirement.
 #' cos_spe <- readCosmxSXE(dirName = cospath)
 #' cos_sce <- readCosmxSXE(dirName = cospath, returnType = "SCE")
+#' cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = TRUE)
+#' cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = TRUE, loadPolygon = FALSE)
 #' 
 #' 
 #' @importFrom SpatialExperiment SpatialExperiment
 #' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
 #' @importFrom methods as
-#' @importFrom utils read.csv
+#' @importFrom data.table fread
+#' @importFrom arrow write_parquet
 readCosmxSXE <- function(dirName = dirName, 
                          returnType = "SPE",
                          countMatPattern = "exprMat_file.csv", 
                          metaDataPattern = "metadata_file.csv", 
-                         coordNames = c("CenterX_global_px", "CenterY_global_px")){
+                         coordNames = c("CenterX_global_px", "CenterY_global_px"),
+                         loadFovPos = FALSE,
+                         fovPosPattern = "fov_positions_file.csv",
+                         altExps = NULL,
+                         addParquetPaths = FALSE,
+                         ...){
   
   returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  tech <- "CosMx"
   
-  ## Metadata sanity check 
-  if(!any(file.exists(file.path(dirName, list.files(dirName, metaDataPattern))))){
-    stop("CosMx metadata file does not exist in the directory. Expect 'metadata_file.csv' in `dirName`")
-  }
+  # Sanity checks
+  countmat_file <- .sanityCheck(tech, filetype = "count matrix", expectfilename = "`exprMat_file.csv`", 
+                                dirName = dirName, filepatternvar = countMatPattern)
+  metadata_file <- .sanityCheck(tech, filetype = "metadata", expectfilename = "`metadata_file.csv`", 
+                                dirName = dirName, filepatternvar = metaDataPattern)
+  if(loadFovPos) fov_pos_file <- .sanityCheck(tech, filetype = "fov position", expectfilename = "`fov_positions_file.csv`", 
+                                              dirName = dirName, filepatternvar = fovPosPattern)
   
-  metadata_file <- file.path(dirName, list.files(dirName, metaDataPattern))
-  if(length(metadata_file) > 1){
-    stop("More than one metadata file possible with the provided pattern `metaDataPattern`")
-  }
-  
-  ## Count matrix sanity check
-  if(!any(file.exists(file.path(dirName, list.files(dirName, countMatPattern))))){
-    stop("CosMx count matrix does not exist in the directory. Expect 'exprMat_file.csv' in `dirName`")
-  }
-  
-  countmat_file <- file.path(dirName, list.files(dirName, countMatPattern))
-  if(length(countmat_file) > 1){
-    stop("More than one count matrix file possible with the provided pattern `countMatPattern`")
-  }
-
   # Read in 
-  countmat <- read.csv(countmat_file)
-  metadata <- read.csv(metadata_file)
+  countmat <- as.data.frame(fread(countmat_file))
+  metadata <- as.data.frame(fread(metadata_file))
+  
+  overlap_cols <- intersect(colnames(countmat), colnames(metadata))
   
   # Count matrix   
-  counts_ <- merge(countmat, metadata[, c("fov", "cell_ID")])
-  counts_ <- subset(counts_, select = -c(fov, cell_ID))
+  counts_ <- merge(countmat, metadata[, overlap_cols])
+  counts_ <- counts_[, !(colnames(counts_) %in% overlap_cols)]
   counts_ <- t(counts_)
   
   # rowData (does not exist)
   
   # metadata
-  metadata <- merge(metadata, countmat[, c("fov", "cell_ID")])
-  
+  metadata <- merge(metadata, countmat[, overlap_cols])
+  if(loadFovPos){
+    fovpos <- as.data.frame(fread(fov_pos_file))
+    colnames(fovpos)[colnames(fovpos) == "FOV"] <- "fov"
+    metadata <- merge(metadata, fovpos)
+  }
+
   if(!all(coordNames %in% colnames(metadata))){
-    stop("`coordNames` not in columns of `metaDataPattern`. For CosMx, expect c('CenterX_global_px', 'CenterY_global_px') in the columns of the metadata 'metadata_file.csv'. " )
+    stop("`coordNames` not in columns of `metaDataPattern`. For CosMx, expect 
+         c('CenterX_global_px', 'CenterY_global_px') in the columns of the metadata 'metadata_file.csv'. " )
   }
   
   colnames(counts_) <- rownames(metadata) <- seq_len(ncol(counts_))
   
   if(returnType == "SPE"){
-  sxe <- SpatialExperiment::SpatialExperiment(
-    assays = list(counts = as(counts_, "dgCMatrix")),
-    # rowData = rowData,
-    colData = metadata,
-    spatialCoordsNames = coordNames)
+    sxe <- SpatialExperiment(
+      assays = list(counts = as(counts_, "dgCMatrix")),
+      # rowData = rowData,
+      colData = metadata,
+      spatialCoordsNames = coordNames)
+    #altExps=alt)
   }else if(returnType == "SCE"){
-    # construct 'SingleCellExperiment'
-    sxe <- SingleCellExperiment::SingleCellExperiment(
+    sxe <- SingleCellExperiment(
       assays = list(counts = as(counts_, "dgCMatrix")),
       colData = metadata
+      #altExps=alt
     )
   }
   
+  if(!is.null(altExps)){
+    idx <- lapply(altExps, grep, rownames(sxe))     # get features matching input pattern(s)
+    idx <- idx[vapply(idx, length, numeric(1)) > 0] # drops elements without match
+    if(length(idx)){                                # skip if there aren't any matches
+      alt <- lapply(idx, \(.) sxe[., ])
+      altExps(sxe)[names(alt)] <- alt
+      sxe <- sxe[-unlist(idx), ]
+    }
+  }
+  
+  # Add Parquet Paths
+  if(addParquetPaths) sxe <- addParquetPathsCosMx(sxe, dirName, ...)
+  
   return(sxe)
 }
+

@@ -61,26 +61,11 @@ readMerscopeSXE <- function(dirName = dirName,
                             coordNames = c("center_x", "center_y")){
   
   returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  tech <- "Merscope"
   
-  ## Metadata sanity check 
-  if(!any(file.exists(file.path(dirName, list.files(dirName, metaDataPattern))))){
-    stop("MERSCOPE metadata file does not exist in the directory. Expect 'cell_metadata.csv' in `dirName`")
-  }
-  
-  metadata_file <- file.path(dirName, list.files(dirName, metaDataPattern))
-  if(length(metadata_file) > 1){
-    stop("More than one metadata file possible with the provided pattern `metaDataPattern`")
-  }
-  
-  ## Count matrix sanity check
-  if(!any(file.exists(file.path(dirName, list.files(dirName, countMatPattern))))){
-    stop("MERSCOPE count matrix does not exist in the directory. Expect 'cell_by_gene.csv' in `dirName`")
-  }
-  
-  countmat_file <- file.path(dirName, list.files(dirName, countMatPattern))
-  if(length(countmat_file) > 1){
-    stop("More than one count matrix file possible with the provided pattern `countMatPattern`")
-  }
+  # Sanity checks
+  countmat_file <- .sanityCheck(tech, filetype = "count matrix", expectfilename = "`cell_by_gene.csv`", dirName = dirName, filepatternvar = countMatPattern)
+  metadata_file <- .sanityCheck(tech, filetype = "metadata", expectfilename = "`cell_metadata.csv`", dirName = dirName, filepatternvar = metaDataPattern)
   
   # Read in 
   countmat <- read.csv(countmat_file)
