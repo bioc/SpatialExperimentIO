@@ -1,6 +1,6 @@
 Package: SpatialExperimentIO
 Title: Read in Xenium, CosMx, MERSCOPE or STARmapPLUS data as SpatialExperiment object
-Version: 0.99.3
+Version: 0.99.4
 Authors@R: c(
     person("Yixing E.", "Dong", 
         email = "estelladong729@gmail.com", 
@@ -20,7 +20,8 @@ Imports:
   methods,
   data.table,
   arrow,
-  purrr
+  purrr,
+  S4Vectors
 Suggests: 
   knitr, 
   rmarkdown, 

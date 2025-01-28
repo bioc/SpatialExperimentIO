@@ -23,9 +23,18 @@
 #' 
 #' @param addExperimentXenium to add experiment.xenium parameters to \code{metadata(sxe)} or not. 
 #' Default value is FALSE. 
-#' @param altExps 
-#' @param addParquetPaths Default value is FALSE,
-#' `loadTx`, `txMetaNames`, `txPattern`, `loadCellBound`, `cellBoundMetaNames`, `cellBoundPattern`, `loadNucBound`, `NucBoundMetaNames`, `NucBoundPattern`
+#' @param altExps gene names contains these strings will be moved to \code{altExps(sxe)} 
+#' as list of separate sxe. Default is NULL. Suggest 
+#' \code{c(negprobe="^NegControlProbe", antisense = "^antisense", negcode="^NegControlCodeword", blank = "^BLANK")}. 
+#' @param addParquetPaths to add parquet paths to \code{metadata(sxe)} or not. If TRUE, 
+#' transcripts, cell_boundaries, and nucleus_boundaries .parquet paths will be added to `metadata()`. 
+#' If, for instance, no cell_boundaries file is available, and transcript and nucleus_boundaries
+#' files are available, please set this argument to TRUE and adjust loadCellBound = FALSE 
+#' in the \code{...} argument. 
+#' @param ... extra parameters to pass to addParquetPathsXenium(), including 
+#' `loadTx`, `txMetaNames`, `txPattern`, `loadCellBound`, `cellBoundMetaNames`, 
+#' `cellBoundPattern`, `loadNucBound`, `NucBoundMetaNames`, `NucBoundPattern`.
+#' 
 #'
 #' @details
 #' The constructor assumes the downloaded unzipped Xenium Output Bundle has the 
@@ -76,8 +85,9 @@
 #' xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE, loadNucBound = FALSE)
 #'
 #' @importFrom DropletUtils read10xCounts
-#' @importFrom SpatialExperiment SpatialExperiment
-#' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
+#' @importFrom SpatialExperiment SpatialExperiment 
+#' @importFrom S4Vectors metadata metadata<-
+#' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData altExps altExps<-
 #' @importFrom methods as
 #' @importFrom arrow read_parquet read_json_arrow
 #' 

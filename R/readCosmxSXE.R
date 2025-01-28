@@ -67,12 +67,12 @@
 #' # One of the following depending on your output (`SPE` or `SCE`) requirement.
 #' cos_spe <- readCosmxSXE(dirName = cospath)
 #' cos_sce <- readCosmxSXE(dirName = cospath, returnType = "SCE")
-#' cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = TRUE)
 #' cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = TRUE, loadPolygon = FALSE)
 #' 
 #' 
-#' @importFrom SpatialExperiment SpatialExperiment
-#' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
+#' @importFrom SpatialExperiment SpatialExperiment 
+#' @importFrom S4Vectors metadata metadata<-
+#' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData altExps altExps<-
 #' @importFrom methods as
 #' @importFrom data.table fread
 #' @importFrom arrow write_parquet

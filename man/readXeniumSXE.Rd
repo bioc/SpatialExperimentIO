@@ -39,10 +39,19 @@ Default value is \code{c("x_centroid", "y_centroid")}, and there is no need to c
 \item{addExperimentXenium}{to add experiment.xenium parameters to \code{metadata(sxe)} or not.
 Default value is FALSE.}
 
-\item{altExps}{}
+\item{altExps}{gene names contains these strings will be moved to \code{altExps(sxe)}
+as list of separate sxe. Default is NULL. Suggest
+\code{c(negprobe="^NegControlProbe", antisense = "^antisense", negcode="^NegControlCodeword", blank = "^BLANK")}.}
 
-\item{addParquetPaths}{Default value is FALSE,
-\code{loadTx}, \code{txMetaNames}, \code{txPattern}, \code{loadCellBound}, \code{cellBoundMetaNames}, \code{cellBoundPattern}, \code{loadNucBound}, \code{NucBoundMetaNames}, \code{NucBoundPattern}}
+\item{addParquetPaths}{to add parquet paths to \code{metadata(sxe)} or not. If TRUE,
+transcripts, cell_boundaries, and nucleus_boundaries .parquet paths will be added to \code{metadata()}.
+If, for instance, no cell_boundaries file is available, and transcript and nucleus_boundaries
+files are available, please set this argument to TRUE and adjust loadCellBound = FALSE
+in the \code{...} argument.}
+
+\item{...}{extra parameters to pass to addParquetPathsXenium(), including
+\code{loadTx}, \code{txMetaNames}, \code{txPattern}, \code{loadCellBound}, \code{cellBoundMetaNames},
+\code{cellBoundPattern}, \code{loadNucBound}, \code{NucBoundMetaNames}, \code{NucBoundPattern}.}
 }
 \value{
 a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object

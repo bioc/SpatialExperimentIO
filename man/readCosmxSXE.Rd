@@ -90,7 +90,6 @@ list.files(cospath)
 # One of the following depending on your output (`SPE` or `SCE`) requirement.
 cos_spe <- readCosmxSXE(dirName = cospath)
 cos_sce <- readCosmxSXE(dirName = cospath, returnType = "SCE")
-cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = TRUE)
 cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = TRUE, loadPolygon = FALSE)
 
 

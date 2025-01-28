@@ -1,10 +1,6 @@
 dir <- system.file(
   file.path("extdata", "CosMx_small"), 
   package="SpatialExperimentIO")
-# dir <- "~/Desktop/SpatialExperimentIO/inst/extdata/CosMx_small"
-# dir <- "~/Downloads/Pancreas_CosMx_WTX"
-# dir <- "~/Downloads/HumanFC"
-# dir <- "~/Downloads/Lung9_Rep1"
 
 test_that("example data folders uniquely contains needed files", {
   expect_true("lung_p9s1_exprMat_file.csv" %in% list.files(dir))
@@ -13,7 +9,7 @@ test_that("example data folders uniquely contains needed files", {
   expect_true("lung_p9s1_tx_file.csv" %in% list.files(dir))
   
   # parquet
-  expect_true("tx_file.parquet" %in% list.files(dir))
+  expect_true("lung_p9s1_tx_file.parquet" %in% list.files(dir))
   
   expect_length(list.files(dir, "exprMat_file.csv"), 1)
   expect_length(list.files(dir, "metadata_file.csv"), 1)
@@ -21,7 +17,7 @@ test_that("example data folders uniquely contains needed files", {
   expect_length(list.files(dir, "tx_file.csv"), 1)
   
   # parquet
-  expect_length(list.files(dir, "tx_file.parquet"), 1)
+  expect_length(list.files(dir, "lung_p9s1_tx_file.parquet"), 1)
 })
 
 test_that("needed files contains spatial columns of interest", {
@@ -92,8 +88,8 @@ test_that("data can be read in, even no polygon file, had loadPolygon = FALSE, a
                     altExps = NULL,
                     addParquetPaths = TRUE,
                     loadPolygon = FALSE)
-  expect_true(metadata(x)$transcripts == file.path(dir, "lung_p9s1_tx_file.parquet"))
-  expect_true(is.null(metadata(x)$polygons))
+  expect_true(S4Vectors::metadata(x)$transcripts == file.path(dir, "lung_p9s1_tx_file.parquet"))
+  expect_true(is.null(S4Vectors::metadata(x)$polygons))
 })
 
 test_that("data can be read in, directly read parquet of transcripts", {

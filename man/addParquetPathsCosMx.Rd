@@ -56,7 +56,7 @@ cospath <- system.file(file.path("extdata", "CosMx_small"),
                        package = "SpatialExperimentIO")
 
 sxe <- readCosmxSXE(dirName = cospath, addParquetPaths = FALSE)
-sxe <- addParquetPathsCosMx(sxe, dirName = cospath)
+sxe <- addParquetPathsCosMx(sxe, dirName = cospath, loadPolygon = FALSE)
 
 }
 \author{

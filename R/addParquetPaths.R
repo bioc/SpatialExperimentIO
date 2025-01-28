@@ -32,7 +32,7 @@
 #'                        package = "SpatialExperimentIO")
 #' 
 #' sxe <- readCosmxSXE(dirName = cospath, addParquetPaths = FALSE)
-#' sxe <- addParquetPathsCosMx(sxe, dirName = cospath)
+#' sxe <- addParquetPathsCosMx(sxe, dirName = cospath, loadPolygon = FALSE)
 #'
 addParquetPathsCosMx <- function(sxe,
                                  dirName, 

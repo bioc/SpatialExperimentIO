@@ -35,9 +35,10 @@ Therefore, to avoid the pain of object conversion, we give the flexibility to le
 # Setup
 
 ```{r, warning=FALSE, message=FALSE}
-library(SpatialExperimentIO)
-library(SpatialExperiment)
-# library(ggplot2)
+suppressMessages({
+  library(SpatialExperimentIO)
+  library(SpatialExperiment)
+})
 ```
 
 # Quick Start
@@ -143,12 +144,7 @@ xe_spe <- readXeniumSXE(dirName = xepath)
 xe_spe
 ```
 
-Additionally, Xenium gives different control genes in their gene panel (check with `altExpNames(xe_spe)` to see). In this mini example, we obtain a Xenium dataset with 4 genes all with type of `"Gene Expression"` and 6 cells just for illustration. 
-
-```{r}
-table(rowData(xe_spe)$Type)
-```
-In a real Xenium data download, possible `altExp(xe_spe)` for Xenium can be the following categories, depending on the experiment setup. In the below example, we also add `experiment.xenium` to `metaata()`. We add any other .parquet files (`cell_boundaries.parquet`, `nucleus_boundaries.parquet`), except `transcripts.parquet`, to the `metadata()`. You can control what path to add with additional boolean arguments - `loadTx`, `loadCellBound`, `loadNucBound`. See the documentation for the helper function `addParquetPathsXenium()`.
+Additionally, Xenium gives different control genes in their gene panel (check with `altExpNames(xe_spe)` to see). In this mini example, we obtain a Xenium dataset with 4 genes all with type of `"Gene Expression"` in their `rowData(xe_spe)`` and 6 cells just for illustration. In a real Xenium data download, possible `altExp(xe_spe)` for Xenium can be the following categories, depending on the experiment setup. In the below example, we also add `experiment.xenium` to `metaata()`. We add any other .parquet files (`cell_boundaries.parquet`, `nucleus_boundaries.parquet`), except `transcripts.parquet`, to the `metadata()`. You can control what path to add with additional boolean arguments - `loadTx`, `loadCellBound`, `loadNucBound`. See the documentation for the helper function `addParquetPathsXenium()`.
 
 ```{r}
 xe_spe <- readXeniumSXE(xepath,

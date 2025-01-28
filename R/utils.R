@@ -10,17 +10,17 @@
 #'
 #' @author Yixing Estella Dong
 #' 
-#' @return 
-#' @export
+#' @return a path to a unique file of count matrix or colData.
 #'
 #' @examples 
+#' \dontrun{
 #' dir <- system.file(file.path("extdata", "CosMx_small"),
 #'                    package = "SpatialExperimentIO")
-#' countmat_file <- .sanityCheck(tech = "CosMx", filetype = "count matrix",
+#' countmat_file <- SpatialExperimentIO:::.sanityCheck(tech = "CosMx", filetype = "count matrix",
 #'                               expectfilename = "`exprMat_file.csv`",
 #'                               dirName = dir,
 #'                               filepatternvar = "exprMat_file.csv")
-#'
+#'}
 .sanityCheck <- function(tech, filetype, expectfilename, dirName, filepatternvar){
   if(!any(file.exists(file.path(dirName, list.files(dirName, filepatternvar))))){
     stop(paste(tech, filetype , "file does not exist in the directory. Expect", expectfilename, "in", "`dirName`"))
@@ -56,7 +56,7 @@
 #' @importFrom data.table fread
 #' @importFrom arrow write_parquet
 #' 
-csvToParquetPaths <- function(dirName, filepath = tx_csv_path){
+csvToParquetPaths <- function(dirName, filepath = "tx_csv_path"){
   parquet_path <- paste0(gsub(".csv", "", filepath), ".parquet")
   if(!file.exists(parquet_path)) write_parquet(as.data.frame(fread(filepath)), parquet_path)
 
@@ -80,7 +80,6 @@ csvToParquetPaths <- function(dirName, filepath = tx_csv_path){
 #' @export 
 #'
 #' @examples
-#' 
 #' dir <- system.file(file.path("extdata", "CosMx_small"),
 #'                    package = "SpatialExperimentIO")
 #' sxe <- readCosmxSXE(dir)
@@ -90,6 +89,7 @@ csvToParquetPaths <- function(dirName, filepath = tx_csv_path){
 #'                             filePattern = "tx_file.parquet")
 #' 
 #' @importFrom purrr walk2
+#' @importFrom S4Vectors metadata metadata<-
 #' 
 addParquetPathToMeta <- function(sxe, 
                                  dirName = dirName,
@@ -121,6 +121,8 @@ addParquetPathToMeta <- function(sxe,
       parquet_paths <- append(parquet_paths_csv, parquet_paths)
     }
   }
+  
+  parquet_paths <- unlist(parquet_paths)
   
   walk2(metaNames, parquet_paths, function(name, path) {
     metadata(sxe)[[name]] <<- path
