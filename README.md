@@ -18,7 +18,7 @@ You can also install the development version of *SpatialExperimentIO* from [GitH
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("estellad/SpatialExperimentIO")
+devtools::install_github("estellad/SpatialExperimentIO", ref = "devel")
 ```
 
 # Load package
