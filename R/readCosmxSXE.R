@@ -17,19 +17,19 @@
 #' @param coordNames a vector of two strings specify the spatial coord names. 
 #' Default value is \code{c("CenterX_global_px", "CenterY_global_px")}, and 
 #' there is no need to change.
-#' @param loadFovPos to merge fov_position_list.csv to \code{colData(sxe)} or not. 
-#' Default is FALSE.
+#' @param addFovPos to merge fov_position_list.csv to \code{colData(sxe)} or not. 
+#' Default is TRUE.
 #' @param fovPosPattern .csv pattern of fov_position_list.csv files in the raw download. 
 #' Default value is \code{"fov_positions_file.csv"}.
 #' @param altExps gene names contains these strings will be moved to \code{altExps(sxe)} 
-#' as list of separate sxe. Default is NULL. Suggest \code{c(negprobe="^Neg", falsecode="^Sys")}. 
+#' as separate sxe-s. Default is \code{c("NegPrb", "Negative", "SystemControl", "FalseCode")}. 
 #' @param addParquetPaths to add parquet paths to \code{metadata(sxe)} or not. If TRUE, 
 #' transcripts and polygon .csv files will be converted to .parquet, and the paths 
 #' will be added. If, for instance, no polygon file is available, and only transcript 
-#' file is available, please set this argument to TRUE and adjust loadPolygon = FALSE 
-#' in the \code{...} argument. 
-#' @param ... extra parameters to pass to addParquetPathsCosMx(), including 
-#' `loadTx`, `txMetaNames`, `txPattern`, `loadPolygon`, `polygonMetaNames`,
+#' file is available, please set this argument to TRUE and adjust `addPolygon = FALSE` 
+#' in the \code{...} argument. Default is TRUE.
+#' @param ... extra parameters to pass to \code{\link{addParquetPathsCosmx}()}, including 
+#' `addTx`, `txMetaNames`, `txPattern`, `addPolygon`, `polygonMetaNames`,
 #' `polygonPattern`.
 #' 
 #' @details
@@ -40,10 +40,13 @@
 #' · | — *_metadata_file.csv \cr
 #' 
 #' Optional files to add to the metadata() as a list of paths (will be converted to parquet):
+#' · | — *_fov_positions_file.csv \cr
 #' · | — *_tx_file.csv \cr
 #' · | — *_polygons.csv \cr
-#' · | — *_fov_positions_file.csv \cr
-#' See addParquetPathsCosmx()
+#' If no optional files, need to set `addFovPos = FALSE` and `addParquetPaths = FALSE`.
+#' If only one of `*_tx_file.csv` or `*_polygons.csv` exists, set `addParquetPaths = TRUE` but 
+#' set the not available `addTx` or `addPolygon` to `FALSE`. 
+#' See \code{\link{addParquetPathsCosmx}()}
 #'
 #' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
@@ -65,9 +68,9 @@
 #' list.files(cospath)
 #' 
 #' # One of the following depending on your output (`SPE` or `SCE`) requirement.
-#' cos_spe <- readCosmxSXE(dirName = cospath)
-#' cos_sce <- readCosmxSXE(dirName = cospath, returnType = "SCE")
-#' cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = TRUE, loadPolygon = FALSE)
+#' cos_spe <- readCosmxSXE(dirName = cospath, addPolygon = FALSE)
+#' cos_sce <- readCosmxSXE(dirName = cospath, returnType = "SCE", addPolygon = FALSE)
+#' cos_spe <- readCosmxSXE(dirName = cospath, addParquetPaths = FALSE)
 #' 
 #' 
 #' @importFrom SpatialExperiment SpatialExperiment 
@@ -82,10 +85,10 @@ readCosmxSXE <- function(dirName = dirName,
                          countMatPattern = "exprMat_file.csv", 
                          metaDataPattern = "metadata_file.csv", 
                          coordNames = c("CenterX_global_px", "CenterY_global_px"),
-                         loadFovPos = FALSE,
+                         addFovPos = TRUE,
                          fovPosPattern = "fov_positions_file.csv",
-                         altExps = NULL,
-                         addParquetPaths = FALSE,
+                         altExps = c("NegPrb", "Negative", "SystemControl", "FalseCode"),
+                         addParquetPaths = TRUE,
                          ...){
   
   returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
@@ -96,7 +99,7 @@ readCosmxSXE <- function(dirName = dirName,
                                 dirName = dirName, filepatternvar = countMatPattern)
   metadata_file <- .sanityCheck(tech, filetype = "metadata", expectfilename = "`metadata_file.csv`", 
                                 dirName = dirName, filepatternvar = metaDataPattern)
-  if(loadFovPos) fov_pos_file <- .sanityCheck(tech, filetype = "fov position", expectfilename = "`fov_positions_file.csv`", 
+  if(addFovPos) fov_pos_file <- .sanityCheck(tech, filetype = "fov position", expectfilename = "`fov_positions_file.csv`", 
                                               dirName = dirName, filepatternvar = fovPosPattern)
   
   # Read in 
@@ -114,7 +117,7 @@ readCosmxSXE <- function(dirName = dirName,
   
   # metadata
   metadata <- merge(metadata, countmat[, overlap_cols])
-  if(loadFovPos){
+  if(addFovPos){
     fovpos <- as.data.frame(fread(fov_pos_file))
     colnames(fovpos)[colnames(fovpos) == "FOV"] <- "fov"
     metadata <- merge(metadata, fovpos)
@@ -143,6 +146,7 @@ readCosmxSXE <- function(dirName = dirName,
   }
   
   if(!is.null(altExps)){
+    names(altExps) <- altExps
     idx <- lapply(altExps, grep, rownames(sxe))     # get features matching input pattern(s)
     idx <- idx[vapply(idx, length, numeric(1)) > 0] # drops elements without match
     if(length(idx)){                                # skip if there aren't any matches
@@ -153,7 +157,7 @@ readCosmxSXE <- function(dirName = dirName,
   }
   
   # Add Parquet Paths
-  if(addParquetPaths) sxe <- addParquetPathsCosMx(sxe, dirName, ...)
+  if(addParquetPaths) sxe <- addParquetPathsCosmx(sxe, dirName, ...)
   
   return(sxe)
 }

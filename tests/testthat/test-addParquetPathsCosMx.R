@@ -11,6 +11,6 @@ test_that("Able to add files independently for CosMx", {
   x <- readCosmxSXE(dirName = dir, addParquetPaths = FALSE)
   expect_true(length(metadata(x)) == 0)
   
-  x <- addParquetPathsCosMx(x, dirName = dir, loadPolygon = FALSE)
+  x <- addParquetPathsCosmx(x, dirName = dir, addPolygon = FALSE)
   expect_true("transcripts" %in% names(metadata(x)))
 })

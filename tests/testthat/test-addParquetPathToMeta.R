@@ -19,7 +19,7 @@ dir <- system.file(
 
 test_that("Able to add a file path for Xenium", {
   x <- readXeniumSXE(dirName = dir, addParquetPaths = FALSE)
-  expect_true(length(metadata(x)) == 0)
+  expect_true(length(metadata(x)) == 1)
   
   x <- addParquetPathToMeta(x, dirName = dir, 
                             metaNames = "transcripts",

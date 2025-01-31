@@ -10,9 +10,10 @@ readXeniumSXE(
   countMatPattern = "cell_feature_matrix.h5",
   metaDataPattern = "cells.parquet",
   coordNames = c("x_centroid", "y_centroid"),
-  addExperimentXenium = FALSE,
-  altExps = NULL,
-  addParquetPaths = FALSE,
+  addExperimentXenium = TRUE,
+  altExps = c("NegControlProbe", "UnassignedCodeword", "NegControlCodeword", "antisense",
+    "BLANK"),
+  addParquetPaths = TRUE,
   ...
 )
 }
@@ -37,21 +38,20 @@ need to change.}
 Default value is \code{c("x_centroid", "y_centroid")}, and there is no need to change.}
 
 \item{addExperimentXenium}{to add experiment.xenium parameters to \code{metadata(sxe)} or not.
-Default value is FALSE.}
+Default value is TRUE.}
 
-\item{altExps}{gene names contains these strings will be moved to \code{altExps(sxe)}
-as list of separate sxe. Default is NULL. Suggest
-\code{c(negprobe="^NegControlProbe", antisense = "^antisense", negcode="^NegControlCodeword", blank = "^BLANK")}.}
+\item{altExps}{gene names contains these strings will be moved to \code{altExps(sxe)} as separate sxe-s.
+Default is \code{c("NegControlProbe", "UnassignedCodeword", "NegControlCodeword", "antisense", "BLANK")}.}
 
 \item{addParquetPaths}{to add parquet paths to \code{metadata(sxe)} or not. If TRUE,
 transcripts, cell_boundaries, and nucleus_boundaries .parquet paths will be added to \code{metadata()}.
 If, for instance, no cell_boundaries file is available, and transcript and nucleus_boundaries
-files are available, please set this argument to TRUE and adjust loadCellBound = FALSE
-in the \code{...} argument.}
+files are available, please set this argument to TRUE and adjust \code{addCellBound = FALSE}
+in the \code{...} argument. Default is TRUE.}
 
-\item{...}{extra parameters to pass to addParquetPathsXenium(), including
-\code{loadTx}, \code{txMetaNames}, \code{txPattern}, \code{loadCellBound}, \code{cellBoundMetaNames},
-\code{cellBoundPattern}, \code{loadNucBound}, \code{NucBoundMetaNames}, \code{NucBoundPattern}.}
+\item{...}{extra parameters to pass to \code{\link{addParquetPathsXenium}()}, including
+\code{addTx}, \code{txMetaNames}, \code{txPattern}, \code{addCellBound}, \code{cellBoundMetaNames},
+\code{cellBoundPattern}, \code{addNucBound}, \code{NucBoundMetaNames}, \code{NucBoundPattern}.}
 }
 \value{
 a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object
@@ -101,7 +101,7 @@ xe_spe <- readXeniumSXE(dirName = xepath, countMatPattern = "cell_feature_matrix
 xe_sce <- readXeniumSXE(dirName = xepath, returnType = "SCE")
 
 xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE)
-xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE, loadNucBound = FALSE)
+xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE, addNucBound = FALSE)
 
 }
 \author{

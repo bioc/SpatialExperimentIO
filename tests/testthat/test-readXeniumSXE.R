@@ -55,7 +55,7 @@ test_that("data are read correctly to SingleCellExperiment class", {
                      addExperimentXenium = FALSE,
                      altExps = NULL,
                      addParquetPaths = TRUE,
-                     loadTx = FALSE)
+                     addTx = FALSE)
   
   expect_s4_class(x, "SingleCellExperiment")
   expect_true(all(c("x_centroid", "y_centroid") %in% colnames(SingleCellExperiment::colData(x))))
@@ -78,7 +78,7 @@ test_that("data are read correctly to SingleCellExperiment class", {
 #                      addExperimentXenium = FALSE,
 #                      altExps = c(negprobe="^NegControlProbe", antisense = "^antisense", negcode="^NegControlCodeword", blank = "^BLANK"),
 #                      addParquetPaths = TRUE,
-#                      loadTx = FALSE)
+#                      addTx = FALSE)
 #   
 #   expect_s4_class(x, "SingleCellExperiment")
 #   expect_true(all(c("negprobe", "antisense", "negcode", "blank") %in% altExpNames(x)))

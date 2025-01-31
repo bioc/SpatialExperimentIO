@@ -22,18 +22,17 @@
 #' Default value is \code{c("x_centroid", "y_centroid")}, and there is no need to change.
 #' 
 #' @param addExperimentXenium to add experiment.xenium parameters to \code{metadata(sxe)} or not. 
-#' Default value is FALSE. 
-#' @param altExps gene names contains these strings will be moved to \code{altExps(sxe)} 
-#' as list of separate sxe. Default is NULL. Suggest 
-#' \code{c(negprobe="^NegControlProbe", antisense = "^antisense", negcode="^NegControlCodeword", blank = "^BLANK")}. 
+#' Default value is TRUE. 
+#' @param altExps gene names contains these strings will be moved to \code{altExps(sxe)} as separate sxe-s. 
+#' Default is \code{c("NegControlProbe", "UnassignedCodeword", "NegControlCodeword", "antisense", "BLANK")}. 
 #' @param addParquetPaths to add parquet paths to \code{metadata(sxe)} or not. If TRUE, 
 #' transcripts, cell_boundaries, and nucleus_boundaries .parquet paths will be added to `metadata()`. 
 #' If, for instance, no cell_boundaries file is available, and transcript and nucleus_boundaries
-#' files are available, please set this argument to TRUE and adjust loadCellBound = FALSE 
-#' in the \code{...} argument. 
-#' @param ... extra parameters to pass to addParquetPathsXenium(), including 
-#' `loadTx`, `txMetaNames`, `txPattern`, `loadCellBound`, `cellBoundMetaNames`, 
-#' `cellBoundPattern`, `loadNucBound`, `NucBoundMetaNames`, `NucBoundPattern`.
+#' files are available, please set this argument to TRUE and adjust `addCellBound = FALSE` 
+#' in the \code{...} argument. Default is TRUE.
+#' @param ... extra parameters to pass to \code{\link{addParquetPathsXenium}()}, including 
+#' `addTx`, `txMetaNames`, `txPattern`, `addCellBound`, `cellBoundMetaNames`, 
+#' `cellBoundPattern`, `addNucBound`, `NucBoundMetaNames`, `NucBoundPattern`.
 #' 
 #'
 #' @details
@@ -82,7 +81,7 @@
 #' xe_sce <- readXeniumSXE(dirName = xepath, returnType = "SCE")
 #' 
 #' xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE)
-#' xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE, loadNucBound = FALSE)
+#' xe_spe <- readXeniumSXE(dirName = xepath, addParquetPaths = TRUE, addNucBound = FALSE)
 #'
 #' @importFrom DropletUtils read10xCounts
 #' @importFrom SpatialExperiment SpatialExperiment 
@@ -96,9 +95,10 @@ readXeniumSXE <- function(dirName,
                           countMatPattern = "cell_feature_matrix.h5",
                           metaDataPattern = "cells.parquet", # or cells.csv.gz 
                           coordNames = c("x_centroid", "y_centroid"), 
-                          addExperimentXenium = FALSE,
-                          altExps = NULL,
-                          addParquetPaths = FALSE,
+                          addExperimentXenium = TRUE,
+                          altExps = c("NegControlProbe", "UnassignedCodeword", 
+                                      "NegControlCodeword", "antisense", "BLANK"),
+                          addParquetPaths = TRUE,
                           ...){
 
   returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
@@ -163,6 +163,7 @@ readXeniumSXE <- function(dirName,
   rownames(sxe) <- rowData(sxe)$Symbol
   
   if(!is.null(altExps)){
+    names(altExps) <- altExps
     idx <- lapply(altExps, grep, rownames(sxe))
     idx <- idx[vapply(idx, length, numeric(1)) > 0]
     if(length(idx)){                              

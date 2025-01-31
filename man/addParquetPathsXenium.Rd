@@ -7,13 +7,13 @@
 addParquetPathsXenium(
   sxe,
   dirName,
-  loadTx = TRUE,
+  addTx = TRUE,
   txMetaNames = "transcripts",
   txPattern = "transcripts.parquet",
-  loadCellBound = TRUE,
+  addCellBound = TRUE,
   cellBoundMetaNames = "cell_boundaries",
   cellBoundPattern = "cell_boundaries.parquet",
-  loadNucBound = TRUE,
+  addNucBound = TRUE,
   NucBoundMetaNames = "nucleus_boundaries",
   NucBoundPattern = "nucleus_boundaries.parquet"
 )
@@ -24,7 +24,7 @@ addParquetPathsXenium(
 \item{dirName}{the directory that stores the transcripts/cell_boundaries/nucleus_boundaries
 .parquet files.}
 
-\item{loadTx}{to load path to transcripts parquet to \code{metadata(sxe)} or not.
+\item{addTx}{to add path to transcripts parquet to \code{metadata(sxe)} or not.
 Default is FALSE.}
 
 \item{txMetaNames}{names to add to slots in \code{metadata(sxe)[["name"]]}.
@@ -36,7 +36,7 @@ Default is \code{"transcripts"}.}
 such as \code{c("transcripts.parquet", "transcripts1.parquet")}. Default value is
 \code{"transcripts.parquet"}.}
 
-\item{loadCellBound}{to load path to cell boundaries parquet to \code{metadata(sxe)} or not.
+\item{addCellBound}{to add path to cell boundaries parquet to \code{metadata(sxe)} or not.
 Default is FALSE.}
 
 \item{cellBoundMetaNames}{names to add to slots in \code{metadata(sxe)[["name"]]}.
@@ -48,7 +48,7 @@ Default is \code{"cell_boundaries"}.}
 such as \code{c("cell_boundaries.parquet", "cell_boundaries1.parquet")}. Default value is
 \code{"cell_boundaries.parquet"}.}
 
-\item{loadNucBound}{to load path to nucleus boundaries parquet to \code{metadata(sxe)} or not.
+\item{addNucBound}{to add path to nucleus boundaries parquet to \code{metadata(sxe)} or not.
 Default is FALSE.}
 
 \item{NucBoundMetaNames}{names to add to slots in \code{metadata(sxe)[["name"]]}.

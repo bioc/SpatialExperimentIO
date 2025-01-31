@@ -43,7 +43,7 @@ test_that("data are read correctly to SpatialExperiment class", {
                     countMatPattern = "exprMat_file.csv", 
                     metaDataPattern = "metadata_file.csv", 
                     coordNames = c("CenterX_global_px", "CenterY_global_px"),
-                    loadFovPos = TRUE,
+                    addFovPos = TRUE,
                     fovPosPattern = "fov_positions_file.csv",
                     altExps = NULL,
                     addParquetPaths = FALSE)
@@ -63,7 +63,7 @@ test_that("data are read correctly to SingleCellExperiment class, no fov positio
                     countMatPattern = "exprMat_file.csv", 
                     metaDataPattern = "metadata_file.csv", 
                     coordNames = c("CenterX_global_px", "CenterY_global_px"),
-                    loadFovPos = FALSE,
+                    addFovPos = FALSE,
                     fovPosPattern = "fov_positions_file.csv",
                     altExps = NULL,
                     addParquetPaths = FALSE)
@@ -77,17 +77,17 @@ test_that("data are read correctly to SingleCellExperiment class, no fov positio
   expect_false(all(c("fov", "x_global_px", "y_global_px") %in% colnames(x@colData))) 
 })
 
-test_that("data can be read in, even no polygon file, had loadPolygon = FALSE, and transcripts read in to metadata(()", {
+test_that("data can be read in, even no polygon file, had addPolygon = FALSE, and transcripts read in to metadata(()", {
   x <- readCosmxSXE(dirName = dir, 
                     returnType = "SPE",
                     countMatPattern = "exprMat_file.csv", 
                     metaDataPattern = "metadata_file.csv", 
                     coordNames = c("CenterX_global_px", "CenterY_global_px"),
-                    loadFovPos = TRUE,
+                    addFovPos = TRUE,
                     fovPosPattern = "fov_positions_file.csv",
                     altExps = NULL,
                     addParquetPaths = TRUE,
-                    loadPolygon = FALSE)
+                    addPolygon = FALSE)
   expect_true(S4Vectors::metadata(x)$transcripts == file.path(dir, "lung_p9s1_tx_file.parquet"))
   expect_true(is.null(S4Vectors::metadata(x)$polygons))
 })
@@ -98,11 +98,11 @@ test_that("data can be read in, directly read parquet of transcripts", {
                     countMatPattern = "exprMat_file.csv", 
                     metaDataPattern = "metadata_file.csv", 
                     coordNames = c("CenterX_global_px", "CenterY_global_px"),
-                    loadFovPos = TRUE,
+                    addFovPos = TRUE,
                     fovPosPattern = "fov_positions_file.csv",
                     altExps = NULL,
                     addParquetPaths = TRUE,
-                    loadPolygon = FALSE,
+                    addPolygon = FALSE,
                     txPattern = "tx_file.parquet")
   expect_true(metadata(x)$transcripts == file.path(dir, "lung_p9s1_tx_file.parquet"))
   # expect_true(metadata(x)$transcripts == file.path(dir, "tx_file.parquet"))
@@ -114,11 +114,11 @@ test_that("data can be read in, directly read parquet of transcripts multiple", 
                     countMatPattern = "exprMat_file.csv", 
                     metaDataPattern = "metadata_file.csv", 
                     coordNames = c("CenterX_global_px", "CenterY_global_px"),
-                    loadFovPos = TRUE,
+                    addFovPos = TRUE,
                     fovPosPattern = "fov_positions_file.csv",
                     altExps = NULL,
                     addParquetPaths = TRUE,
-                    loadPolygon = FALSE,
+                    addPolygon = FALSE,
                     txMetaNames = c("transcripts", "transcripts2"),
                     txPattern = c("tx_file.csv", "tx_file.parquet"))
   expect_true(metadata(x)$transcripts == file.path(dir, "lung_p9s1_tx_file.parquet"))
@@ -132,7 +132,7 @@ test_that("data can be read in, directly read parquet of transcripts multiple", 
 #                     countMatPattern = "exprMat_file.csv", 
 #                     metaDataPattern = "metadata_file.csv", 
 #                     coordNames = c("CenterX_global_px", "CenterY_global_px"),
-#                     loadFovPos = TRUE,
+#                     addFovPos = TRUE,
 #                     fovPosPattern = "fov_positions_file.csv",
 #                     altExps = c(negprobe="^Neg", falsecode="^Sys"),
 #                     addParquetPaths = FALSE)

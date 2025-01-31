@@ -49,10 +49,7 @@ suppressMessages({
 ### DO NOT RUN. Example code.
 xepath <- "/path/to/folder"
 # Xenium as SPE, or SCE by setting `returnType = "SCE"`.
-xe_spe <- readXeniumSXE(dirName = xepath,
-                        addExperimentXenium = TRUE, addParquetPaths = TRUE,
-                        altExps = c(negprobe="^NegControlProbe", antisense = "^antisense",
-                                    negcode="^NegControlCodeword", blank = "^BLANK"))
+xe_spe <- readXeniumSXE(dirName = xepath)
 ```
 
 -   For CosMx data:
@@ -61,9 +58,7 @@ xe_spe <- readXeniumSXE(dirName = xepath,
 ### DO NOT RUN. Example code.
 cospath <- "/path/to/folder"
 # CosMx as SPE, or SCE by setting `returnType = "SCE"`.
-cos_spe <- readCosmxSXE(dirName = cospath,
-                        loadFovPos = TRUE, addParquetPaths = TRUE,
-                        altExps = c(negprobe="^Neg", falsecode="^Sys"))
+cos_spe <- readCosmxSXE(dirName = cospath)
 ```
 
 -   For MERSCOPE data:
@@ -114,60 +109,64 @@ list.files(xepath)
 
 ## Read Xenium as a `SpatialExperiment` object
 
-We commented out the default specification of each variable in `readXeniumSXE()`. To read in Xenium as a `SpatialExperiment` object with just count matrix and column data, you would only need to provide a valid directory name.
+We display the default specification of each variable in `readXeniumSXE()`. To read in Xenium as a `SpatialExperiment` object with count matrix, column data, and all other common raw download files, you would only need to provide a valid directory name.
+
+```{r, eval=FALSE}
+# read the count matrix .h5 file - automatically DropletUtils::read10xCounts(type = "HDF5")
+xe_spe <- readXeniumSXE(dirName = xepath,
+                        returnType = "SPE",
+                        countMatPattern = "cell_feature_matrix.h5",
+                        metaDataPattern = "cells.parquet",
+                        coordNames = c("x_centroid", "y_centroid"),
+                        addExperimentXenium = TRUE, # set to TRUE to load experiment.xenium
+                        altExps = c("NegControlProbe", "UnassignedCodeword",
+                                    "NegControlCodeword", "antisense", "BLANK"),
+                        addParquetPaths = TRUE, # set TRUE to load all .parquet below
+                        ...) # takes arguments as below
+xe_spe <- addParquetPathsXenium(sxe = xe_spe,
+                                dirName = xepath,
+                                addTx = TRUE,
+                                txMetaNames = "transcripts",
+                                txPattern = "transcripts.parquet",
+                                addCellBound = TRUE,
+                                cellBoundMetaNames = "cell_boundaries",
+                                cellBoundPattern = "cell_boundaries.parquet",
+                                addNucBound = TRUE,
+                                NucBoundMetaNames = "nucleus_boundaries",
+                                NucBoundPattern = "nucleus_boundaries.parquet")
+```
+
+
+Note that `experiment.xenium` is by default added to `metaata()`, and you can disable it by setting `addExperimentXenium = FALSE`.
 
 ```{r}
-# # read the count matrix .h5 file - automatically DropletUtils::read10xCounts(type = "HDF5")
-# xe_spe <- readXeniumSXE(dirName = xe_path, 
-#                         returnType = "SPE",
-#                         countMatPattern = "cell_feature_matrix.h5",
-#                         metaDataPattern = "cells.parquet",
-#                         coordNames = c("x_centroid", "y_centroid"), 
-#                         addExperimentXenium = FALSE, # set to TRUE to load experiment.xenium
-#                         altExps = NULL, # possible value c(negprobe="^NegControlProbe", antisense = "^antisense", 
-#                                                            negcode="^NegControlCodeword", blank = "^BLANK")
-#                         addParquetPaths = FALSE, # set TRUE to load all .parquet below
-#                         ...) # takes arguments as below
-# xe_spe <- addParquetPathsXenium(sxe = xe_spe, 
-#                                 dirName = xe_path,
-#                                 loadTx = TRUE,
-#                                 txMetaNames = "transcripts",
-#                                 txPattern = "transcripts.parquet", 
-#                                 loadCellBound = TRUE,
-#                                 cellBoundMetaNames = "cell_boundaries",
-#                                 cellBoundPattern = "cell_boundaries.parquet", 
-#                                 loadNucBound = TRUE,
-#                                 NucBoundMetaNames = "nucleus_boundaries",
-#                                 NucBoundPattern = "nucleus_boundaries.parquet")
-
 xe_spe <- readXeniumSXE(dirName = xepath)
 xe_spe
 ```
 
-Additionally, Xenium gives different control genes in their gene panel (check with `altExpNames(xe_spe)` to see). In this mini example, we obtain a Xenium dataset with 4 genes all with type of `"Gene Expression"` in their `rowData(xe_spe)`` and 6 cells just for illustration. In a real Xenium data download, possible `altExp(xe_spe)` for Xenium can be the following categories, depending on the experiment setup. In the below example, we also add `experiment.xenium` to `metaata()`. We add any other .parquet files (`cell_boundaries.parquet`, `nucleus_boundaries.parquet`), except `transcripts.parquet`, to the `metadata()`. You can control what path to add with additional boolean arguments - `loadTx`, `loadCellBound`, `loadNucBound`. See the documentation for the helper function `addParquetPathsXenium()`.
+Additionally, Xenium gives different control genes in their gene panel (check with `altExpNames(xe_spe)` to see). In this mini example, we obtain a Xenium dataset with 4 genes all with type of `"Gene Expression"` in their `rowData(xe_spe)` and 6 cells just for illustration. In a real Xenium data download, possible `altExp(xe_spe)` for Xenium can have the default categories, depending on the experiment setup. For example, below we manually specified gene names contains "TestGene" will be put into `altExp()`. We add any other .parquet files (`cell_boundaries.parquet`, `nucleus_boundaries.parquet`), except `transcripts.parquet`, to the `metadata()`. You can control what path to add with additional boolean arguments - `addTx`, `addCellBound`, `addNucBound`. See the documentation for the helper function `addParquetPathsXenium()`.
 
 ```{r}
 xe_spe <- readXeniumSXE(xepath,
-                        addExperimentXenium = TRUE,
-                        altExps = c(negprobe="^NegControlProbe", antisense = "^antisense", negcode="^NegControlCodeword", blank = "^BLANK"),
+                        altExps = c("TestGene"),
                         addParquetPaths = TRUE,
-                        loadTx = FALSE)
+                        addTx = FALSE)
 xe_spe
 ```
 
 If you do not have `cell_feature_matrix.h5` but the folder `/cell_feature_matrix` instead, it should contain the following files.
 
-```{r}
-# list.files(file.path(xepath, "cell_feature_matrix"))
+```{r, eval=FALSE}
+list.files(file.path(xepath, "cell_feature_matrix"))
 # "barcodes.tsv.gz" "features.tsv.gz" "matrix.mtx.gz"
 ```
 
 For this example, we only provide `cell_feature_matrix.h5` for demonstration. However, alternatively you can read in Xenium by specifying `countMatPattern` as the folder `"cell_feature_matrix"`. You should also subset to `"Gene Expression"` gene type like previously.
 
-```{r}
-# # or read the count matrix folder - automatically DropletUtils::read10xCounts(type = "sparse") 
-# xe_spe <- readXeniumSXE(dirName = xepath, 
-#                         countMatPattern = "cell_feature_matrix")
+```{r, eval=FALSE}
+# or read the count matrix folder - automatically DropletUtils::read10xCounts(type = "sparse")
+xe_spe <- readXeniumSXE(dirName = xepath,
+                        countMatPattern = "cell_feature_matrix")
 ```
 
 ## Read Xenium as a `SingleCellExperiment` object
@@ -201,40 +200,35 @@ list.files(cospath)
 
 ## Read CosMx as a `SpatialExperiment` object
 
-We commented out the default specification of each variable in `readCosmxSXE()`. To read in CosMx as a `SpatialExperiment` object, you would only need to provide a valid directory name. With this example dataset, we obtained a CosMx `SPE` object with 8 genes and 9 cells.
+We commented out the default specification of each variable in `readCosmxSXE()`. To read in CosMx as a `SpatialExperiment` object, you would only need to provide a valid directory name. 
 
-```{r}
-# cos_spe <- readCosmxSXE(dirName = cospath, 
-#                         returnType = "SPE",
-#                         countMatPattern = "exprMat_file.csv", 
-#                         metaDataPattern = "metadata_file.csv", 
-#                         coordNames = c("CenterX_global_px", "CenterY_global_px"),
-#                         loadFovPos = FALSE, # set to TRUE to add fov position columns to colData()
-#                         fovPosPattern = "fov_positions_file.csv",
-#                         altExps = NULL, # possible value c(negprobe="^Neg", falsecode="^Sys")
-#                         addParquetPaths = FALSE, # set TRUE to load all .parquet below
-#                         ...) # takes arguments as below
-# cos_spe <- addParquetPathsCosMx(sxe = cos_spe,
-#                                 dirName = cospath, 
-#                                 loadTx = TRUE,
-#                                 txMetaNames = "transcripts",
-#                                 txPattern = "tx_file.csv", 
-#                                 loadPolygon = TRUE,
-#                                 polygonMetaNames = "polygons",
-#                                 polygonPattern = "polygons.csv")
-
-cos_spe <- readCosmxSXE(dirName = cospath)
-cos_spe
+```{r, eval=FALSE}
+cos_spe <- readCosmxSXE(dirName = cospath,
+                        returnType = "SPE",
+                        countMatPattern = "exprMat_file.csv",
+                        metaDataPattern = "metadata_file.csv",
+                        coordNames = c("CenterX_global_px", "CenterY_global_px"),
+                        addFovPos = TRUE, # set to TRUE to add fov position columns to colData()
+                        fovPosPattern = "fov_positions_file.csv",
+                        altExps = c("NegPrb", "Negative", "SystemControl", "FalseCode"),
+                        addParquetPaths = TRUE, # set TRUE to add all .parquet below
+                        ...) # takes arguments as below
+cos_spe <- addParquetPathsCosmx(sxe = cos_spe,
+                                dirName = cospath,
+                                addTx = TRUE,
+                                txMetaNames = "transcripts",
+                                txPattern = "tx_file.csv",
+                                addPolygon = TRUE,
+                                polygonMetaNames = "polygons",
+                                polygonPattern = "polygons.csv")
 ```
 
-Here is a demonstration of loading all recommended files as path to parquet in the `metadata()`, except polygons. 
+
+With this example dataset, we obtained a CosMx `SPE` object with 8 genes and 9 cells. Here is a demonstration of adding all recommended files as path to parquet in the `metadata()`, except there is no polygon file in this example data. 
 
 ```{r}
 cos_spe <- readCosmxSXE(cospath,
-                        loadFovPos = TRUE,
-                        altExps = c(negprobe="^Neg", falsecode="^Sys"),
-                        addParquetPaths = TRUE,
-                        loadPolygon = FALSE)
+                        addPolygon = FALSE)
 cos_spe
 ```
 
@@ -243,7 +237,7 @@ cos_spe
 Alternatively, you can also read CosMx in as a `SCE`.
 
 ```{r}
-cos_sce <- readCosmxSXE(dirName = cospath, returnType = "SCE")
+cos_sce <- readCosmxSXE(dirName = cospath, addPolygon = FALSE, returnType = "SCE")
 cos_sce
 ```
 

@@ -7,7 +7,7 @@ dir <- system.file(
 
 test_that("Able to add files independently for Xenium", {
   x <- readXeniumSXE(dirName = dir, addParquetPaths = FALSE)
-  expect_true(length(metadata(x)) == 0)
+  expect_true(length(metadata(x)) == 1)
   
   x <- addParquetPathsXenium(x, dirName = dir)
   expect_true("transcripts" %in% names(metadata(x)))

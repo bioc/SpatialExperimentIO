@@ -82,7 +82,7 @@ csvToParquetPaths <- function(dirName, filepath = "tx_csv_path"){
 #' @examples
 #' dir <- system.file(file.path("extdata", "CosMx_small"),
 #'                    package = "SpatialExperimentIO")
-#' sxe <- readCosmxSXE(dir)
+#' sxe <- readCosmxSXE(dir, addParquetPaths = FALSE)
 #' sxe <- addParquetPathToMeta(sxe,
 #'                             dirName = dir,
 #'                             metaNames = "transcripts",
