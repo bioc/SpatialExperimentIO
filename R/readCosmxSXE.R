@@ -117,11 +117,6 @@ readCosmxSXE <- function(dirName = dirName,
   
   # metadata
   metadata <- merge(metadata, countmat[, overlap_cols])
-  if(addFovPos){
-    fovpos <- as.data.frame(fread(fov_pos_file))
-    colnames(fovpos)[colnames(fovpos) == "FOV"] <- "fov"
-    metadata <- merge(metadata, fovpos)
-  }
 
   if(!all(coordNames %in% colnames(metadata))){
     stop("`coordNames` not in columns of `metaDataPattern`. For CosMx, expect 
@@ -158,6 +153,12 @@ readCosmxSXE <- function(dirName = dirName,
   
   # Add Parquet Paths
   if(addParquetPaths) sxe <- addParquetPathsCosmx(sxe, dirName, ...)
+  
+  # Read in and add FovPos to metadata()
+  if(addFovPos){
+    fovpos <- as.data.frame(fread(fov_pos_file))
+    metadata(sxe)$fov_positions <- fovpos
+  }
   
   return(sxe)
 }

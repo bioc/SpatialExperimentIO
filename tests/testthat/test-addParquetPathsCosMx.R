@@ -9,7 +9,7 @@ dir <- system.file(
 
 test_that("Able to add files independently for CosMx", {
   x <- readCosmxSXE(dirName = dir, addParquetPaths = FALSE)
-  expect_true(length(metadata(x)) == 0)
+  expect_true("fov_positions" %in% names(metadata(x)))
   
   x <- addParquetPathsCosmx(x, dirName = dir, addPolygon = FALSE)
   expect_true("transcripts" %in% names(metadata(x)))

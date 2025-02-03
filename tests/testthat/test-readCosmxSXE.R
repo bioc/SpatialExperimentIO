@@ -54,7 +54,7 @@ test_that("data are read correctly to SpatialExperiment class", {
   expect_false(is.null(colnames(x)))
   expect_true(all(dim(x) == c(8, 9)))
   expect_s4_class(SingleCellExperiment::counts(x), "dgCMatrix")
-  expect_true(all(c("fov", "x_global_px", "y_global_px") %in% colnames(x@colData))) 
+  expect_true(is.data.frame(S4Vectors::metadata(x)$fov_positions)) 
 })
 
 test_that("data are read correctly to SingleCellExperiment class, no fov position in colData", {
@@ -74,7 +74,7 @@ test_that("data are read correctly to SingleCellExperiment class, no fov positio
   expect_false(is.null(colnames(x)))
   expect_true(all(dim(x) == c(8, 9)))
   expect_s4_class(SingleCellExperiment::counts(x), "dgCMatrix")
-  expect_false(all(c("fov", "x_global_px", "y_global_px") %in% colnames(x@colData))) 
+  expect_true(is.null(S4Vectors::metadata(x)$fov_positions)) 
 })
 
 test_that("data can be read in, even no polygon file, had addPolygon = FALSE, and transcripts read in to metadata(()", {

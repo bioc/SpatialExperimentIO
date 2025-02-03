@@ -121,8 +121,9 @@ xe_spe <- readXeniumSXE(dirName = xepath,
                         addExperimentXenium = TRUE, # set to TRUE to load experiment.xenium
                         altExps = c("NegControlProbe", "UnassignedCodeword",
                                     "NegControlCodeword", "antisense", "BLANK"),
-                        addParquetPaths = TRUE, # set TRUE to load all .parquet below
-                        ...) # takes arguments as below
+                        addParquetPaths = TRUE #, # set TRUE to load all .parquet below
+                        # ... # takes arguments as below
+                        ) 
 xe_spe <- addParquetPathsXenium(sxe = xe_spe,
                                 dirName = xepath,
                                 addTx = TRUE,
@@ -211,8 +212,9 @@ cos_spe <- readCosmxSXE(dirName = cospath,
                         addFovPos = TRUE, # set to TRUE to add fov position columns to colData()
                         fovPosPattern = "fov_positions_file.csv",
                         altExps = c("NegPrb", "Negative", "SystemControl", "FalseCode"),
-                        addParquetPaths = TRUE, # set TRUE to add all .parquet below
-                        ...) # takes arguments as below
+                        addParquetPaths = TRUE # , # set TRUE to add all .parquet below
+                        # ... # takes arguments as below
+                        ) 
 cos_spe <- addParquetPathsCosmx(sxe = cos_spe,
                                 dirName = cospath,
                                 addTx = TRUE,

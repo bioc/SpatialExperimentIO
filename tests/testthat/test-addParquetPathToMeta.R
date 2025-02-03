@@ -4,7 +4,7 @@ dir <- system.file(
 
 test_that("Able to add a file path for CosMx", {
   x <- readCosmxSXE(dirName = dir, addParquetPaths = FALSE)
-  expect_true(length(metadata(x)) == 0)
+  expect_true("fov_positions" %in% names(metadata(x)))
   
   x <- addParquetPathToMeta(x, dirName = dir,
                             metaNames = "transcripts",
