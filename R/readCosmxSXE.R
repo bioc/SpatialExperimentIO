@@ -17,8 +17,8 @@
 #' @param coordNames a vector of two strings specify the spatial coord names. 
 #' Default value is \code{c("CenterX_global_px", "CenterY_global_px")}, and 
 #' there is no need to change.
-#' @param addFovPos to merge fov_position_list.csv to \code{colData(sxe)} or not. 
-#' Default is TRUE.
+#' @param addFovPos to read in fov_position_list.csv and add the data frame to 
+#' \code{metadata(sxe)$fov_positions} or not. Default is TRUE.
 #' @param fovPosPattern .csv pattern of fov_position_list.csv files in the raw download. 
 #' Default value is \code{"fov_positions_file.csv"}.
 #' @param altExps gene names contains these strings will be moved to \code{altExps(sxe)} 
