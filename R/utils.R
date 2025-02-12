@@ -16,14 +16,16 @@
 #' \dontrun{
 #' dir <- system.file(file.path("extdata", "CosMx_small"),
 #'                    package = "SpatialExperimentIO")
-#' countmat_file <- SpatialExperimentIO:::.sanityCheck(tech = "CosMx", filetype = "count matrix",
+#' countmat_file <- SpatialExperimentIO:::.sanityCheck(tech = "CosMx", 
+#'                               filetype = "count matrix",
 #'                               expectfilename = "`exprMat_file.csv`",
 #'                               dirName = dir,
 #'                               filepatternvar = "exprMat_file.csv")
 #'}
 .sanityCheck <- function(tech, filetype, expectfilename, dirName, filepatternvar){
   if(!any(file.exists(file.path(dirName, list.files(dirName, filepatternvar))))){
-    stop(paste(tech, filetype , "file does not exist in the directory. Expect", expectfilename, "in", "`dirName`"))
+    stop(paste(tech, filetype , "file does not exist in the directory. Expect", 
+               expectfilename, "in", "`dirName`"))
   }
   
   path_to_file <- file.path(dirName, list.files(dirName, filepatternvar))
@@ -96,17 +98,21 @@ addParquetPathToMeta <- function(sxe,
                                  metaNames = "transcripts",
                                  filePattern = "tx_file.csv"){
   if(!all(grepl(".csv|.parquet", filePattern))){
-    stop("Require each `*Pattern` have a '.csv' or '.parquet' file extension.")
+    stop(paste0("Require each ", filePattern, " in `filePattern` has a '.csv' 
+                or '.parquet' file extension."))
   }
   
   fileswpat <- unlist(lapply(filePattern, list.files, path = dirName))
   
   if(length(metaNames) != length(fileswpat)){
-    stop("Number of metadata slot names and number of detect files with `*Pattern` have different lengths")
+    stop(paste0("Number of metadata slot names: ", metaNames, 
+                " in `metaNames` and number of detect files with ", 
+                filePattern, " in `filePattern` have different lengths"))
   }
   
   if(length(fileswpat) == 0){
-    stop("File with `*Pattern` does not exist in the directory.")
+    stop(paste0("File with ", filePattern, 
+                " in `filePattern` does not exist in the directory."))
   }else{
     if(all(grepl(".csv", fileswpat))){           # all csv, no parquet
       tx_files <- file.path(dirName, fileswpat)

@@ -31,7 +31,8 @@ Used for count matrix and metadata only, as they require unique.
 \dontrun{
 dir <- system.file(file.path("extdata", "CosMx_small"),
                    package = "SpatialExperimentIO")
-countmat_file <- SpatialExperimentIO:::.sanityCheck(tech = "CosMx", filetype = "count matrix",
+countmat_file <- SpatialExperimentIO:::.sanityCheck(tech = "CosMx", 
+                              filetype = "count matrix",
                               expectfilename = "`exprMat_file.csv`",
                               dirName = dir,
                               filepatternvar = "exprMat_file.csv")
